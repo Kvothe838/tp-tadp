@@ -28,7 +28,7 @@ describe 'ORM' do
     end
     expect(expresion).to be false
   end
-  it 'All instances' do
+  it 'all_instances' do
     TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Smith'
@@ -41,9 +41,56 @@ describe 'ORM' do
     otra_persona.age = 96
     otra_persona.save!
     personas = Person.all_instances!
-    personas.each do |una_persona|
-      puts "Nombre: #{una_persona.last_name},#{una_persona.first_name}  Edad:#{una_persona.age}"
-    end
-    expect(personas.size).to be 2
+    expect(personas.first.last_name).to eq('Smith')
+    expect(personas.last.last_name).to eq('Wayne')
+  end
+
+  it 'find_by_id' do
+    TADB::DB.clear_all
+    persona = Person.new
+    persona.last_name = 'Esponja'
+    persona.first_name = 'Bob'
+    persona.age = 20
+    persona.save!
+    otra_persona = Person.find_by_id(persona.id).first
+    expect(otra_persona.last_name).to eq(persona.last_name)
+
+
+    Person.find_by_age(69)
+    Person.find_by_last_name("last_name")
+    Person.find_by_first_name("first_name")
+  end
+
+  it 'find_by_last_name' do
+    TADB::DB.clear_all
+    persona = Person.new
+    persona.last_name = 'Esponja'
+    persona.first_name = 'Bob'
+    persona.age = 20
+    persona.save!
+    otra_persona = Person.find_by_last_name(persona.last_name).first
+    expect(otra_persona.last_name).to eq(persona.last_name)
+  end
+
+  it 'find_by_fist_name' do
+    TADB::DB.clear_all
+    persona = Person.new
+    persona.last_name = 'Esponja'
+    persona.first_name = 'Bob'
+    persona.age = 20
+    persona.save!
+    otra_persona = Person.find_by_first_name(persona.first_name).first
+    expect(otra_persona.first_name).to eq(persona.first_name)
+  end
+
+  it 'find_by_age' do
+    TADB::DB.clear_all
+    persona = Person.new
+    persona.last_name = 'Esponja'
+    persona.first_name = 'Bob'
+    persona.age = 20
+    persona.save!
+    otra_persona = Person.find_by_age(persona.age).first
+    expect(otra_persona.age).to eq(persona.age)
   end
 end

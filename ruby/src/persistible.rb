@@ -4,7 +4,9 @@ $tablas = []
 # algun comentario
 module Persistible
 
-  attr_accessor :id
+  attr_accessor :id, :abcd
+
+  @abcd = []
 
   def save!
     mi_tabla = get_tabla(self.class.to_s)
@@ -39,7 +41,7 @@ module Persistible
     @id = nil
   end
 
-  self.class.class_eval() do
+  self.class.class_eval do
     def all_instances!
       instancias = []
       filas = TADB::DB.table(to_s).entries
@@ -52,15 +54,23 @@ module Persistible
       instancias
     end
   end
-
 end
 
-# Agrega al Hash una columna
+# Agrega al Hash una columna y agrega el find_by_<valor>(valor)
 def has_one(tipo, nombre)
   nombre_tabla = to_s
   una_tabla = get_tabla(nombre_tabla)
   unless una_tabla.repite_columna(nombre)
     una_tabla.agregar_columna!(Hash[:tipo, tipo].merge(nombre))
+    self.class.define_method("find_by_#{nombre[:named]}") do |arg|
+      self.all_instances!.filter { |instancia|
+        instancia.instance_variable_get("@#{nombre[:named]}") === arg }
+    end
+    unless self.class.instance_methods.include?(:find_by_id)
+      self.class.define_method("find_by_id") do |arg|
+        self.all_instances!.filter { |instancia| instancia.instance_variable_get("@id") === arg }
+      end
+    end
   end
 end
 
