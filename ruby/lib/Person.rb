@@ -1,7 +1,8 @@
 require 'tadb'
 require_relative '../src/persistible'
-class Person < Persistible
+class Person
 
+  include Persistible
   has_one String, named: :first_name
   has_one String, named: :last_name
   has_one Numeric, named: :age

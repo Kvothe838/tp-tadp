@@ -2,7 +2,7 @@
 $tablas = []
 
 # algun comentario
-class Persistible
+module Persistible
 
   attr_accessor :id
 

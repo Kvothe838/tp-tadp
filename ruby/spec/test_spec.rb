@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe 'ORM' do
-  TADB::DB.clear_all
+  # TADB::DB.clear_all
   it 'Crea a Cosmo Kramer de 40, hace un save!, luego cambia a Cosme Fulanito de 25 y hace refresh!' do
     persona = Person.new
     persona.last_name = 'Kramer'
