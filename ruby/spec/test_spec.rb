@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe 'ORM' do
-  # TADB::DB.clear_all
+  TADB::DB.clear_all
   it 'Crea a Cosmo Kramer de 40, hace un save!, luego cambia a Cosme Fulanito de 25 y hace refresh!' do
     persona = Person.new
     persona.last_name = 'Kramer'
@@ -27,5 +27,23 @@ describe 'ORM' do
       fila[:last_name] == 'Simpson' && fila[:first_name] == 'Homero'
     end
     expect(expresion).to be false
+  end
+  it 'All instances' do
+    TADB::DB.clear_all
+    persona = Person.new
+    persona.last_name = 'Smith'
+    persona.first_name = 'John'
+    persona.age = 69
+    persona.save!
+    otra_persona = Person.new
+    otra_persona.last_name = 'Wayne'
+    otra_persona.first_name = 'John'
+    otra_persona.age = 96
+    otra_persona.save!
+    personas = Person.all_instances!
+    personas.each do |una_persona|
+      puts "Nombre: #{una_persona.last_name},#{una_persona.first_name}  Edad:#{una_persona.age}"
+    end
+    expect(personas.size).to be 2
   end
 end

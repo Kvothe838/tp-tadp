@@ -38,6 +38,21 @@ module Persistible
     tabla.delete(@id)
     @id = nil
   end
+
+  self.class.class_eval() do
+    def all_instances!
+      instancias = []
+      filas = TADB::DB.table(to_s).entries
+      filas.each do |una_fila|
+        instancia = new
+        instancia.id = una_fila[:id]
+        instancia.refresh!
+        instancias << instancia
+      end
+      instancias
+    end
+  end
+
 end
 
 # Agrega al Hash una columna
