@@ -109,4 +109,37 @@ describe 'ORM' do
     otra_persona = Person.find_by_age(persona.age).first
     expect(otra_persona.age).to eq(persona.age)
   end
+
+  it 'Creo a Bob Esponja con 20 años admin, con valores de tipo correcto' do
+    persona = Person.new
+    persona.last_name = 'Esponja'
+    persona.first_name = 'Bob'
+    persona.age = 20
+    persona.save!
+
+    expect(persona.validar!).to be_nil
+  end
+
+  it 'Creo a 30 Esponja con 20 años admin, con first_name de tipo incorrecto ' do
+    persona = Person.new
+    persona.first_name = 30
+    persona.last_name = 'Esponja'
+    persona.age = 20
+    persona.save!
+
+    mensaje_esperado = 'El atributo first_name no contiene valor de clase String'
+    expect{persona.validar!}.to raise_error(TipoIncorrectoException, mensaje_esperado)
+  end
+
+  it 'Creo a 30 Esponja con 20 años admin, con is_admin de tipo incorrecto ' do
+    persona = Person.new
+    persona.first_name = 'Bob'
+    persona.last_name = 'Esponja'
+    persona.is_admin = 'no'
+    persona.age = 20
+    persona.save!
+
+    mensaje_esperado = 'El atributo is_admin no contiene valor de clase Boolean'
+    expect{persona.validar!}.to raise_error(TipoIncorrectoException, mensaje_esperado)
+  end
 end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative './Tabla'
+require_relative './TipoIncorrectoException'
 
 # Mixin necesario para la clase que desee implementar un ORM.
 module Persistible
@@ -39,9 +40,19 @@ module Persistible
     @id = nil
   end
 
-  # def validar! (tipo, otro_tipo)
-  #   return tipo.is_a? otro_tipo
-  # end
+  def validar!
+    @@tabla.columnas.each do |atributo|
+      nombre_atributo = atributo[:named]
+      valor_atributo_instancia = instance_variable_get "@#{nombre_atributo}"
+      clase_correcta_atributo = atributo[:tipo]
+
+      unless valor_atributo_instancia.is_a? clase_correcta_atributo
+        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
+        raise TipoIncorrectoException.new mensaje_exception
+      end
+    end
+    nil
+  end
 
   self.class.class_eval do
     @@tabla = nil
