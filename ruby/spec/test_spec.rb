@@ -2,6 +2,10 @@
 
 describe 'ORM' do
   TADB::DB.clear_all
+
+  #En vez de hacer un include en la clase Person la puedo hacer de esta forma.
+  Person.include(Persistible)
+
   it 'Crea a Cosmo Kramer de 40, hace un save!, luego cambia a Cosme Fulanito de 25 y hace refresh!' do
     persona = Person.new
     persona.last_name = 'Kramer'
@@ -54,11 +58,6 @@ describe 'ORM' do
     persona.save!
     otra_persona = Person.find_by_id(persona.id).first
     expect(otra_persona.last_name).to eq(persona.last_name)
-
-
-    Person.find_by_age(69)
-    Person.find_by_last_name("last_name")
-    Person.find_by_first_name("first_name")
   end
 
   it 'find_by_last_name' do
