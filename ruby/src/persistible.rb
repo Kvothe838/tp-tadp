@@ -6,17 +6,23 @@ module Persistible
   attr_accessor :id, :table
 
   def save!
-    # mi_tabla = get_tabla(self.class.to_s)
     nuevo_hash = Hash.new
-    instance_variables.each do |attribute|
-      columna = @@tabla.columnas.find do |col|
-        col[:named].to_s == attribute[/[a-z]+(.)+/]
-      end
-      unless columna.nil?
-        valor = instance_variable_get attribute
-        nuevo_hash[columna[:named]] ||= valor
-      end
+
+    @@tabla.columnas.each do |col|
+      valor = instance_variable_get "@#{col[:named]}"
+        nuevo_hash[col[:named]] ||= valor
     end
+
+    # instance_variables.each do |attribute|
+    #   columna = @@tabla.columnas.find do |col|
+    #     col[:named].to_s == attribute[/[a-z]+(.)+/]
+    #   end
+    #   unless columna.nil? #es nil cuando atributo no es persistente, osea no tiene has_one o has_many
+    #     valor = instance_variable_get attribute
+    #     nuevo_hash[columna[:named]] ||= valor
+    #   end
+    # end
+
     tabla = TADB::DB.table(self.class.to_s)
     @id = tabla.insert(nuevo_hash)
   end
@@ -41,8 +47,19 @@ module Persistible
     @id = nil
   end
 
+  # def validar! (tipo, otro_tipo)
+  #   return tipo.is_a? otro_tipo
+  # end
+
   self.class.class_eval do
     @@tabla = nil
+
+    unless self.class.instance_methods.include?(:find_by_id)
+      self.class.define_method("find_by_id") do |arg|
+        self.all_instances!.filter { |instancia| instancia.instance_variable_get("@id") === arg }
+      end
+    end
+
     def all_instances!
       instancias = []
       filas = TADB::DB.table(to_s).entries
@@ -64,18 +81,12 @@ module Persistible
           self.all_instances!.filter { |instancia|
             instancia.instance_variable_get("@#{dato[:named]}") === arg }
         end
-        unless self.class.instance_methods.include?(:find_by_id)
-          self.class.define_method("find_by_id") do |arg|
-            self.all_instances!.filter { |instancia| instancia.instance_variable_get("@id") === arg }
-          end
-        end
       end
     end
 
     def get_tabla(nombre)
       if @@tabla.nil?
         @@tabla = Columnas.new(nombre)
-        puts @@tabla.to_s
       end
       @@tabla
     end
