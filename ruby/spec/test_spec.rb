@@ -128,7 +128,7 @@ describe 'ORM' do
     persona.save!
 
     mensaje_esperado = 'El atributo first_name no contiene valor de clase String'
-    expect{persona.validar!}.to raise_error(TipoIncorrectoException, mensaje_esperado)
+    expect { persona.validar! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
   end
 
   it 'Creo a 30 Esponja con 20 años admin, con is_admin de tipo incorrecto ' do
@@ -140,6 +140,6 @@ describe 'ORM' do
     persona.save!
 
     mensaje_esperado = 'El atributo is_admin no contiene valor de clase Boolean'
-    expect{persona.validar!}.to raise_error(TipoIncorrectoException, mensaje_esperado)
+    expect { persona.validar! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
   end
 end
