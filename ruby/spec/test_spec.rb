@@ -12,6 +12,20 @@ describe 'ORM' do
     TADB::DB.clear_all
   end
 
+  it 'Crea correctamente a Kal L de 30 admin' do
+    persona = Person.new
+    persona.first_name = 'Kal'
+    persona.last_name = 'El'
+    persona.age = 30
+    persona.is_admin = true
+    persona.save!
+
+    hay_fila_con_datos_persona = TADB::DB.table(persona.class.to_s).entries.any? { |fila|
+      fila[:first_name] == 'Kal' && fila[:last_name] == 'El' && fila[:age] == 30 && fila[:is_admin] }
+
+    expect(hay_fila_con_datos_persona).to be true
+  end
+
   it 'Crea a Cosmo Kramer de 40, hace un save!, luego cambia a Cosme Fulanito de 25 y hace refresh!' do
     persona = Person.new
     persona.last_name = 'Kramer'
