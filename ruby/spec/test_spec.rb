@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 describe 'ORM' do
-  TADB::DB.clear_all
+  before do
+    TADB::DB.clear_all
 
-  #En vez de hacer un include en la clase Person la puedo hacer de esta forma.
-  Person.include(Persistible)
+    #En vez de hacer un include en la clase Person la puedo hacer de esta forma.
+    Person.include(Persistible)
+  end
+
+  after do
+    TADB::DB.clear_all
+  end
 
   it 'Crea a Cosmo Kramer de 40, hace un save!, luego cambia a Cosme Fulanito de 25 y hace refresh!' do
     persona = Person.new
@@ -18,6 +24,7 @@ describe 'ORM' do
     persona.refresh!
     expect(persona.last_name).to eq('Kramer')
   end
+
   it 'Crea a Homero Simpson, lo guarda y luego hace un forget!' do
     persona = Person.new
     persona.last_name = 'Simpson'
@@ -32,8 +39,8 @@ describe 'ORM' do
     end
     expect(expresion).to be false
   end
+
   it 'all_instances' do
-    TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Smith'
     persona.first_name = 'John'
@@ -50,7 +57,6 @@ describe 'ORM' do
   end
 
   it 'find_by_id' do
-    TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Esponja'
     persona.first_name = 'Bob'
@@ -61,7 +67,6 @@ describe 'ORM' do
   end
 
   it 'find_by_last_name' do
-    TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Esponja'
     persona.first_name = 'Bob'
@@ -72,7 +77,6 @@ describe 'ORM' do
   end
 
   it 'find_by_fist_name' do
-    TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Esponja'
     persona.first_name = 'Bob'
@@ -83,7 +87,6 @@ describe 'ORM' do
   end
 
   it 'find_by_age' do
-    TADB::DB.clear_all
     persona = Person.new
     persona.last_name = 'Esponja'
     persona.first_name = 'Bob'
