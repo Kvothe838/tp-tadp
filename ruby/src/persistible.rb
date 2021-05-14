@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+require_relative './Tabla'
+require_relative './TipoIncorrectoException'
 
-# algun comentario
+# Mixin necesario para la clase que desee implementar un ORM.
 module Persistible
 
   attr_accessor :id, :table
@@ -8,23 +10,15 @@ module Persistible
   def save!
     nuevo_hash = Hash.new
 
-    @@tabla.columnas.each do |col|
-      valor = instance_variable_get "@#{col[:named]}"
+    unless @@tabla.nil?
+      @@tabla.columnas.each do |col|
+        valor = instance_variable_get "@#{col[:named]}"
         nuevo_hash[col[:named]] ||= valor
+      end
+
+      tabla = TADB::DB.table(self.class.to_s)
+      @id = tabla.insert(nuevo_hash)
     end
-
-    # instance_variables.each do |attribute|
-    #   columna = @@tabla.columnas.find do |col|
-    #     col[:named].to_s == attribute[/[a-z]+(.)+/]
-    #   end
-    #   unless columna.nil? #es nil cuando atributo no es persistente, osea no tiene has_one o has_many
-    #     valor = instance_variable_get attribute
-    #     nuevo_hash[columna[:named]] ||= valor
-    #   end
-    # end
-
-    tabla = TADB::DB.table(self.class.to_s)
-    @id = tabla.insert(nuevo_hash)
   end
 
   def refresh!
@@ -32,11 +26,10 @@ module Persistible
     unless @id.nil?
       #obtengo la fila con el id
       una_fila = tabla.entries.find { |fila| fila[:id] == @id }
-      # por cada par key => value en la fila, obtengo el symbol del atributo a partir de key,
-      # y con instance_variable_set le asigno el value a el symbol que es @algo ej @first_name
+      # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
+      # (casteado desde string) que es @algo ej @first_name
       una_fila.each do |key, value|
-        sym = "@#{key}".to_sym
-        instance_variable_set(sym, value)
+        instance_variable_set("@#{key}", value)
       end
     else
       puts "Este objeto no tiene id"
@@ -49,17 +42,32 @@ module Persistible
     @id = nil
   end
 
-  # def validar! (tipo, otro_tipo)
-  #   return tipo.is_a? otro_tipo
-  # end
+  def validar!
+    @@tabla.columnas.each do |atributo|
+      nombre_atributo = atributo[:named]
+      valor_atributo_instancia = instance_variable_get "@#{nombre_atributo}"
+      clase_correcta_atributo = atributo[:tipo]
+
+      unless valor_atributo_instancia.is_a? clase_correcta_atributo
+        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
+        raise TipoIncorrectoException.new mensaje_exception
+      end
+    end
+    nil
+  end
 
   self.class.class_eval do
     @@tabla = nil
 
-    unless self.class.instance_methods.include?(:find_by_id)
-      self.class.define_method("find_by_id") do |arg|
-        self.all_instances!.filter { |instancia| instancia.instance_variable_get("@id") === arg }
+    def define_find_by_method(nombre_columna)
+      self.class.define_method("find_by_#{nombre_columna}") do |arg|
+        all_instances!.filter { |instancia|
+          instancia.instance_variable_get("@#{nombre_columna}") == arg }
       end
+    end
+
+    unless self.class.instance_methods.include?(:find_by_id)
+      define_find_by_method('id')
     end
 
     def all_instances!
@@ -76,42 +84,19 @@ module Persistible
 
     def has_one(tipo, dato)
       nombre_tabla = to_s
-      una_tabla = get_tabla(nombre_tabla)
-      unless una_tabla.repite_columna(dato)
-        una_tabla.agregar_columna!(Hash[:tipo, tipo].merge(dato))
-        self.class.define_method("find_by_#{dato[:named]}") do |arg|
-          self.all_instances!.filter { |instancia|
-            instancia.instance_variable_get("@#{dato[:named]}") === arg }
-        end
-      else
-        puts "Columna Repetida"
+      tabla_clase = get_tabla(nombre_tabla)
+      unless tabla_clase.repite_columna(dato)
+        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(dato))
+        nombre_columna = dato[:named]
+        define_find_by_method(nombre_columna)
       end
     end
 
     def get_tabla(nombre)
-      if @@tabla.nil?
-        @@tabla = Columnas.new(nombre)
-      end
+      @@tabla = Tabla.new(nombre) if @@tabla.nil?
       @@tabla
     end
 
   end
 end
 
-class Columnas
-
-  attr_accessor :columnas, :nombre
-
-  def initialize(nombre)
-    @columnas = []
-    @nombre = nombre
-  end
-
-  def repite_columna(nombre_columna)
-    @columnas.any? { |obj| obj[:named] == nombre_columna[:named] }
-  end
-
-  def agregar_columna!(columna)
-    @columnas << columna
-  end
-end
