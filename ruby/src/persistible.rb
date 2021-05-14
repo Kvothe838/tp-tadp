@@ -38,6 +38,8 @@ module Persistible
         sym = "@#{key}".to_sym
         instance_variable_set(sym, value)
       end
+    else
+      puts "Este objeto no tiene id"
     end
   end
 
@@ -81,6 +83,8 @@ module Persistible
           self.all_instances!.filter { |instancia|
             instancia.instance_variable_get("@#{dato[:named]}") === arg }
         end
+      else
+        puts "Columna Repetida"
       end
     end
 
