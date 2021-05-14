@@ -31,6 +31,8 @@ module Persistible
       una_fila.each do |key, value|
         instance_variable_set("@#{key}", value)
       end
+    else
+      puts "Este objeto no tiene id"
     end
   end
 
