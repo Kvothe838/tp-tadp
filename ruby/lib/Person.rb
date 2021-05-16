@@ -1,4 +1,4 @@
-require_relative '../src/Boolean'
+require_relative '../src/boolean'
 require_relative '../src/persistible'
 
 class Person

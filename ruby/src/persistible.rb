@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-require_relative './Tabla'
-require_relative './TipoIncorrectoException'
+require_relative './tabla'
+require_relative './tipo_incorrecto_exception'
 
 # Mixin necesario para la clase que desee implementar un ORM.
 module Persistible
