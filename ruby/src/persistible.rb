@@ -9,16 +9,15 @@ module Persistible
 
   def save!
     nuevo_hash = Hash.new
+    return if @@tabla.nil?
 
-    unless @@tabla.nil?
-      @@tabla.columnas.each do |col|
-        valor = instance_variable_get "@#{col[:named]}"
-        nuevo_hash[col[:named]] ||= valor
-      end
-
-      tabla = TADB::DB.table(self.class.to_s)
-      @id = tabla.insert(nuevo_hash)
+    @@tabla.columnas.each do |col|
+      valor = instance_variable_get "@#{col[:named]}"
+      nuevo_hash[col[:named]] ||= valor
     end
+
+    tabla = TADB::DB.table(self.class.to_s)
+    @id = tabla.insert(nuevo_hash)
   end
 
   def refresh!
@@ -96,7 +95,6 @@ module Persistible
       @@tabla = Tabla.new(nombre) if @@tabla.nil?
       @@tabla
     end
-
   end
 end
 
