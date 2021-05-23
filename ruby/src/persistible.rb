@@ -25,14 +25,9 @@ module Persistible
       puts "Este objeto no tiene id"
       return
     end
-
-    #obtengo la fila con el id
     una_fila = self.class.find_by_id_from_table(@id)
-    # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
-    # (casteado desde string) que es @algo ej @first_name
-    una_fila.each do |key, value|
-      instance_variable_set("@#{key}", value)
-    end
+    attr_persistibles.refresh!(self, una_fila)
+
   end
 
   def forget!

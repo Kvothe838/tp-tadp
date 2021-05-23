@@ -1,14 +1,14 @@
-# frozen_string_literal: true
-
 describe 'ORM' do
   let(:first_name) { 'Kal' }
-  let(:last_name) { 'El'  }
+  let(:last_name) { 'El' }
   let(:age) { 30 }
+  let(:notas) { Grade.new }
   let(:persona) do
     persona = Person.new
     persona.first_name = first_name
     persona.last_name = last_name
     persona.age = age
+    persona.notas = Grade.new
     persona
   end
 
@@ -49,6 +49,7 @@ describe 'ORM' do
     let(:new_first_name) { 'Fulanito' }
     let(:new_last_name) { 'Cosme'  }
     let(:new_age) { 40 }
+    
 
 
     subject(:refresh!) { persona.refresh! }
