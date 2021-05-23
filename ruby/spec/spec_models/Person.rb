@@ -1,14 +1,15 @@
-require_relative '../src/boolean'
-require_relative '../src/persistible'
+require_relative '../../src/boolean'
+require_relative '../../src/persistible'
 
 class Person
+  include Persistible
 
   has_one String, named: :first_name
   has_one String, named: :last_name
   has_one Numeric, named: :age
   has_one Boolean, named: :is_admin
 
-  attr_accessor :first_name, :last_name, :age, :is_admin
+  attr_accessor :saraza
 
   def initialize
     super

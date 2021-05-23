@@ -195,7 +195,7 @@ describe 'ORM' do
     let(:last_name) { 'Bob'  }
     let(:age) { 20 }
 
-    subject(:validar) { persona.validar! }
+    subject(:validar) { persona.send(:validar!) }
 
     context 'Cuando no hay errores' do
       it 'crea a Bob Esponja sin errores' do

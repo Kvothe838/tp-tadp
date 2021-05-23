@@ -1,6 +1,7 @@
 require 'rspec'
-require_relative '../lib/Person'
+require_relative 'spec_models/Person'
 require 'tadb'
+require 'pry'
 
 module SpecHelperMethods
   def context
