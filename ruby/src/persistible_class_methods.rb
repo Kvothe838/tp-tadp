@@ -11,11 +11,25 @@ module Persistible
       instancias
     end
 
-    def has_one(tipo, named: raise('named requerido'))
+    def has_one(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil)
+      validates = []
+      if(no_blank!=nil)
+        validates << Hash[:no_blank, no_blank]
+      end
+      if(from!=nil)
+        validates << Hash[:from, from]
+      end
+      if(to!=nil)
+        validates << Hash[:to, to]
+      end
+      if(validate!=nil)
+        validates << Hash[:validate, validate]
+      end
+
       attr_accessor named.to_sym
       tabla_clase = attr_persistibles
       unless tabla_clase.repite_columna(named)
-        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]))
+        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates]))
         define_find_by_method(named)
       end
     end
