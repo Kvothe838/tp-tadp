@@ -10,7 +10,7 @@ class Person
   has_one String, named: :last_name
   has_one Numeric, named: :age
   has_one Boolean, named: :is_admin
-  has_one Grade, named: :notas_value
+  has_one Grade, named: :grade
 
   attr_accessor :saraza
 

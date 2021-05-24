@@ -27,7 +27,6 @@ module Persistible
     end
     una_fila = self.class.find_by_id_from_table(@id)
     attr_persistibles.refresh!(self, una_fila)
-
   end
 
   def forget!
@@ -39,7 +38,11 @@ module Persistible
   self.class.class_eval do
     def define_find_by_method(nombre_columna)
       self.class.define_method("find_by_#{nombre_columna}") do |arg|
+        #puts all_instances!
         all_instances!.filter { |instancia|
+          #puts arg
+          #puts nombre_columna
+          #puts instancia.age
           instancia.instance_variable_get("@#{nombre_columna}") == arg }
       end
     end

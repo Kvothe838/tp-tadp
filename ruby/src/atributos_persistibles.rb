@@ -20,8 +20,6 @@ class AtributosPersistibles
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
 
-      puts nombre_atributo
-      puts valor_atributo_instancia.class
       unless valor_atributo_instancia.is_a? clase_correcta_atributo
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
         raise TipoIncorrectoException.new mensaje_exception
@@ -33,25 +31,18 @@ class AtributosPersistibles
   def dame_el_hash(objeto)
     atributos.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
-      nombre_atributo = col[:named]
 
+      valor = objeto.instance_variable_get "@#{col[:named]}"
       if es_tipo_primitivo? tipo_atributo
-        valor = objeto.instance_variable_get "@#{col[:named]}"
         a_guardar = valor
         nuevo_hash[col[:named]] ||= a_guardar
       else
-        puts valor
-        puts col
-        #else
-        #puts "Oka"
-        #Es clase no primitiva, o sea que se usa composicion con esta clase
-
-        #puts valor
-        #id_objeto_atributo_instancia = valor.save!
-        #a_guardar = id_objeto_atributo_instancia
-
-        ## a_guardar = valor.save!
-        #end
+        #Guardamos el id del objeto (tipo no primitivo)
+        if(valor.class!=NilClass)
+          valor.save!
+          a_guardar = valor.id
+          nuevo_hash[col[:named]] ||= a_guardar
+        end
       end
       nuevo_hash
     end
@@ -69,12 +60,23 @@ class AtributosPersistibles
     #una_fila = objeto.class.find_by_id_from_table(objeto.id)
     # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
     # (casteado desde string) que es @algo ej @first_name
+    #puts una_fila
     una_fila.each do |key, value|
-      #tipo_atributo = key[:tipo]
-      if es_tipo_primitivo? value.class
+      valor_aux = objeto.instance_variable_get "@#{key}"
+
+      class_atributo = String
+      if(key.to_s != "id")
+        class_atributo = atributos.find { |a| a[:named] == key }[:tipo]
+      end
+
+      if es_tipo_primitivo? class_atributo
         objeto.instance_variable_set("@#{key}", value)
       else
-        puts value.class
+        #A mejorar esta parte e identitificar porque en los tests es nulo
+        valor_aux = Kernel.const_get("Grade".to_s.to_sym).new
+        valor_aux.id = value
+        valor_aux.refresh!
+        objeto.instance_variable_set("@#{key}", valor_aux)
       end
       #Es clase no primitiva, o sea que se usa composicion con esta clase
       # id_objeto_atributo_instancia = tipo_atributo.refresh!
@@ -94,16 +96,6 @@ class AtributosPersistibles
       #      a_refrescar = id_objeto_atributo_instancia
       #    end
       #    nuevo_hash[col[:named]] ||= a_refrescar
-
-
-
-
-
-
-
-
-
     end
-
   end
 end

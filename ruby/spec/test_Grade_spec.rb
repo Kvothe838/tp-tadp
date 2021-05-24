@@ -4,13 +4,14 @@ describe 'ORM' do
   let(:first_name) { 'Kal' }
   let(:last_name) { 'El' }
   let(:age) { 30 }
-  let(:notas) { Grade.new }
+  let(:grade) { Grade.new }
   let(:persona) do
     persona = Person.new
     persona.first_name = first_name
     persona.last_name = last_name
     persona.age = age
-    persona.notas_value = notas
+    persona.grade = grade
+    persona.grade.notas = 1
     persona
   end
 
@@ -32,6 +33,10 @@ describe 'ORM' do
       persona.save!
     end
 
+    it 'posee grade un id presente' do
+      expect(persona.grade.id).not_to be_nil
+    end
+
     it 'posee un id presente' do
       expect(persona.id).not_to be_nil
     end
@@ -51,13 +56,25 @@ describe 'ORM' do
     let(:new_first_name) { 'Fulanito' }
     let(:new_last_name) { 'Cosme'  }
     let(:new_age) { 40 }
-    
+    let(:last_notas) { 3 }
+    let(:new_notas) { 4 }
+    let(:grade) { Grade.new }
 
 
     subject(:refresh!) { persona.refresh! }
 
     before do
+      persona.grade.notas = last_notas
       persona.save!
+    end
+
+    context 'cambiando la nota del grade' do
+      it 'devuelve el nuevo grade' do
+        persona.grade.notas = new_notas
+        expect(persona.grade.notas).to eq(new_notas)
+        refresh!
+        expect(persona.grade.notas).to eq(last_notas)
+      end
     end
 
     context 'cambiando solo el last_name' do
@@ -122,11 +139,14 @@ describe 'ORM' do
     let(:first_name) { 'John' }
     let(:last_name) { 'Smith'  }
     let(:age) { 69 }
+    let(:grade) { Grade.new }
     let!(:john_wayne) do
       otra_persona = Person.new
       otra_persona.last_name = 'Wayne'
       otra_persona.first_name = 'John'
       otra_persona.age = 96
+      otra_persona.grade = Grade.new
+      otra_persona.grade.notas = 2
       otra_persona.save!
       otra_persona
     end
@@ -154,6 +174,7 @@ describe 'ORM' do
     let(:first_name) { 'Esponja' }
     let(:last_name) { 'Bob'  }
     let(:age) { 20 }
+    let(:grade) { grade = Grade.new }
 
     before do
       persona.save!

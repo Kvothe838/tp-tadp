@@ -201,7 +201,7 @@ describe 'ORM' do
 
     context 'Cuando no hay errores' do
       it 'crea a Bob Esponja sin errores' do
-        persona.notas_value = Grade.new
+        persona.grade = Grade.new
         persona.save!
         expect(validar).to be_nil
       end
