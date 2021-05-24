@@ -1,6 +1,7 @@
 require_relative '../../src/boolean'
 require_relative './Student'
 require_relative '../../src/persistible'
+require 'tadb'                    #Usado para el debugger
 
 class Person
   include Persistible

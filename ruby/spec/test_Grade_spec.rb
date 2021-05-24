@@ -1,3 +1,5 @@
+
+
 describe 'ORM' do
   let(:first_name) { 'Kal' }
   let(:last_name) { 'El' }
@@ -8,7 +10,7 @@ describe 'ORM' do
     persona.first_name = first_name
     persona.last_name = last_name
     persona.age = age
-    persona.notas = Grade.new
+    persona.notas_value = notas
     persona
   end
 
@@ -196,6 +198,7 @@ describe 'ORM' do
     let(:first_name) { 'Esponja' }
     let(:last_name) { 'Bob'  }
     let(:age) { 20 }
+    let(:notas) { Grade.new }
 
     subject(:validar) { persona.send(:validar!) }
 

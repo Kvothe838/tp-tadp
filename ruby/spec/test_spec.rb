@@ -4,6 +4,7 @@ describe 'ORM' do
   let(:first_name) { 'Kal' }
   let(:last_name) { 'El'  }
   let(:age) { 30 }
+
   let(:persona) do
     persona = Person.new
     persona.first_name = first_name
@@ -200,6 +201,7 @@ describe 'ORM' do
 
     context 'Cuando no hay errores' do
       it 'crea a Bob Esponja sin errores' do
+        persona.notas_value = Grade.new
         persona.save!
         expect(validar).to be_nil
       end
