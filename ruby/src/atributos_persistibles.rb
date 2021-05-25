@@ -33,7 +33,6 @@ class AtributosPersistibles
   end
 
   def dame_el_hash(objeto)
-    puts atributos
     atributos.filter{|a| a[:relation] == "has_one"}.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
 

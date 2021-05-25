@@ -2,13 +2,29 @@ module Persistible
   module ClassMethods
     def all_instances!
       instancias = []
+      descendants.each do |descendant|
+        table_descendant = descendant.table
+        table_descendant.entries.each do |una_fila|
+          instancia = descendant.new
+          instancia.id = una_fila[:id]
+          instancia.refresh!
+          instancias << instancia
+        end
+      end
+
+
       table.entries.each do |una_fila|
         instancia = new
         instancia.id = una_fila[:id]
         instancia.refresh!
         instancias << instancia
       end
+      #puts instancias
       instancias
+    end
+
+    def descendants
+      ObjectSpace.each_object(Class).select { |klass| klass < self }
     end
 
     def get_validates(no_blank, from, to, validate)
@@ -39,10 +55,10 @@ module Persistible
     def has_field(tipo, named, no_blank, from, to, validate, relation)
       validates = get_validates(no_blank, from, to, validate)
 
-      puts "Self: #{self}"
-      puts "Ancestors: #{self.ancestors}"
+      #puts "Self: #{self}"
+      #puts "Ancestors: #{self.ancestors}"
       ancestors_persistibles = self.ancestors.filter {|a| a.include? (Persistible)}
-      puts "Inicio #{ancestors_persistibles}"
+      #puts "Inicio #{ancestors_persistibles}"
 
       atributos_ancestros = []
       ancestors_persistibles.each do |ancestor|
@@ -52,7 +68,7 @@ module Persistible
       attr_accessor named.to_sym
       tabla_clase = attr_persistibles
 
-      puts "Atr: #{atributos_ancestros}"
+      #puts "Atr: #{atributos_ancestros}"
       atributos_ancestros.each do |atributo|
         tabla_clase.agregar_columna!(atributo)
       end
