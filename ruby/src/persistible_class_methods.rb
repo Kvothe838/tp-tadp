@@ -39,6 +39,18 @@ module Persistible
     def has_field(tipo, named, no_blank, from, to, validate, relation)
       validates = get_validates(no_blank, from, to, validate)
 
+      puts "Self: #{self}"
+      puts "Ancestors: #{self.ancestors}"
+      ancestors_persistibles = self.ancestors.filter {|a| a.include? (Persistible)}
+      puts "Inicio #{ancestors_persistibles}"
+
+      atributos_ancestros = []
+      ancestors_persistibles.each do |ancestor|
+        atributos_ancestros = atributos_ancestros + ancestor.attr_persistibles.atributos
+      end
+
+      puts "Atr: #{atributos_ancestros}"
+
       attr_accessor named.to_sym
       tabla_clase = attr_persistibles
       unless tabla_clase.repite_columna(named)

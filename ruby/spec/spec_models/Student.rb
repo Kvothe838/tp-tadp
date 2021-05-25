@@ -2,10 +2,12 @@
 require_relative './Grade.rb'
 require_relative '../../src/persistible'
 
-class Student
+class OtherPerson
   include Persistible
   has_one String, named: :full_name
-  has_one Grade, named: :grade
+end
 
-  attr_accessor :full_name, :grade
+
+class Student < OtherPerson
+  has_one Grade, named: :grade
 end

@@ -28,8 +28,13 @@ class AtributosPersistibles
     nil
   end
 
+  def dame_los_many()
+    atributos.filter{|a| a[:relation] == "has_many"}
+  end
+
   def dame_el_hash(objeto)
-    atributos.inject({}) do |nuevo_hash, col|
+    puts atributos
+    atributos.filter{|a| a[:relation] == "has_one"}.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
 
       valor = objeto.instance_variable_get "@#{col[:named]}"
@@ -46,7 +51,6 @@ class AtributosPersistibles
       end
       nuevo_hash
     end
-
   end
 
   def es_tipo_primitivo?(tipo)
@@ -63,8 +67,6 @@ class AtributosPersistibles
     #puts una_fila
     #puts atributos
     una_fila.each do |key, value|
-      valor_aux = objeto.instance_variable_get "@#{key}"
-
       class_atributo = String
       if(key.to_s != "id")
         class_atributo = atributos.find { |a| a[:named] == key }[:tipo]
@@ -79,24 +81,35 @@ class AtributosPersistibles
         valor_aux.refresh!
         objeto.instance_variable_set("@#{key}", valor_aux)
       end
-      #Es clase no primitiva, o sea que se usa composicion con esta clase
-      # id_objeto_atributo_instancia = tipo_atributo.refresh!
-      #   a_refrescar = id_objeto_atributo_instancia
-      #end
-      #    dato_no_primitivo --> Guardar con un nombre que nos permita recuperar
-      #
-      # valor = objeto.instance_variable_get "@#{col[:named]}"
-      #    tipo_atributo = col[:tipo]
-      #    nombre_atributo = col[:named]
+    end
 
-      #    if es_tipo_primitivo? tipo_atributo
-      #      a_refrescar = valor
-      #    else
-      #      #Es clase no primitiva, o sea que se usa composicion con esta clase
-      #      id_objeto_atributo_instancia = valor.save!
-      #      a_refrescar = id_objeto_atributo_instancia
-      #    end
-      #    nuevo_hash[col[:named]] ||= a_refrescar
+    atributos_has_many = dame_los_many
+    #puts atributos_has_many
+
+    atributos_has_many.each do |attribute|
+
+      table_name = "#{objeto.class.to_s}-#{attribute[:named].to_s}"
+      tabla_atributo_has_many = TADB::DB.table(table_name)
+      arreglo = []
+
+      tipo = attribute[:tipo]
+      if es_tipo_primitivo? tipo
+        tabla_atributo_has_many.entries.each do |fila|
+          arreglo.push(fila[:value])
+        end
+      else
+        tabla_atributo_has_many.entries.each do |fila|
+
+          #arreglo.push(fila[:value])
+          valor_aux = Kernel.const_get(tipo.to_s.to_sym).new
+          valor_aux.id = fila[:value]
+          valor_aux.refresh!
+          arreglo.push(valor_aux)
+        end
+      end
+
+      objeto.instance_variable_set("@#{attribute[:named]}", arreglo)
+      #puts tabla_atributo_has_many.entries
     end
   end
 end

@@ -11,6 +11,9 @@ class Person
   has_one Numeric, named: :age
   has_one Boolean, named: :is_admin
   has_one Grade, named: :grade
+  has_many Numeric, named: :notes
+  has_many String, named: :apodos
+  has_many Grade, named: :grados
 
   attr_accessor :saraza
 
