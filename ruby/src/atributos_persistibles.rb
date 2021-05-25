@@ -61,6 +61,7 @@ class AtributosPersistibles
     # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
     # (casteado desde string) que es @algo ej @first_name
     #puts una_fila
+    #puts atributos
     una_fila.each do |key, value|
       valor_aux = objeto.instance_variable_get "@#{key}"
 
@@ -73,7 +74,7 @@ class AtributosPersistibles
         objeto.instance_variable_set("@#{key}", value)
       else
         #A mejorar esta parte e identitificar porque en los tests es nulo
-        valor_aux = Kernel.const_get("Grade".to_s.to_sym).new
+        valor_aux = Kernel.const_get(class_atributo.to_s.to_sym).new
         valor_aux.id = value
         valor_aux.refresh!
         objeto.instance_variable_set("@#{key}", valor_aux)
