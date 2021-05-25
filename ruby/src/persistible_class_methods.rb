@@ -49,10 +49,14 @@ module Persistible
         atributos_ancestros = atributos_ancestros + ancestor.attr_persistibles.atributos
       end
 
-      puts "Atr: #{atributos_ancestros}"
-
       attr_accessor named.to_sym
       tabla_clase = attr_persistibles
+
+      puts "Atr: #{atributos_ancestros}"
+      atributos_ancestros.each do |atributo|
+        tabla_clase.agregar_columna!(atributo)
+      end
+
       unless tabla_clase.repite_columna(named)
         tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation])))
         define_find_by_method(named)

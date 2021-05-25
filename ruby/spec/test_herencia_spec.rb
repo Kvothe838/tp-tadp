@@ -1,5 +1,3 @@
-
-
 describe 'ORM' do
   let(:full_name) { 'Kal' }
   let(:grade) { Grade.new }
