@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 describe 'ORM' do
+  def comparar_persona(persona, persona2)
+    expect(persona.id).to eq(persona2.id)
+    expect(persona.last_name).to eq(persona2.last_name)
+    expect(persona.first_name).to eq(persona2.first_name)
+    expect(persona.age).to eq(persona2.age)
+  end
+
   let(:first_name) { 'Kal' }
   let(:last_name) { 'El'  }
   let(:age) { 30 }
@@ -140,11 +147,14 @@ describe 'ORM' do
     end
 
     it 'Contiene a John Wayne' do
-      expect(all_instances.first.context).to eq(john_wayne.context)
+      expect(all_instances.first.id).to eq(john_wayne.id)
+      expect(all_instances.first.last_name).to eq(john_wayne.last_name)
+      expect(all_instances.first.first_name).to eq(john_wayne.first_name)
+      expect(all_instances.first.age).to eq(john_wayne.age)
     end
 
     it 'Contiene a John Smith' do
-      expect(all_instances.last.context).to eq(persona.context)
+      comparar_persona(all_instances.last, persona)
     end
   end
 
@@ -163,7 +173,7 @@ describe 'ORM' do
       subject {Person.find_by_id(id).first }
 
       it 'find by id trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -171,7 +181,7 @@ describe 'ORM' do
       subject {Person.find_by_last_name(persona.last_name).first }
 
       it 'find by last name trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -179,7 +189,7 @@ describe 'ORM' do
       subject {Person.find_by_first_name(persona.first_name).first }
 
       it 'find by first name trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -187,7 +197,7 @@ describe 'ORM' do
       subject {Person.find_by_age(persona.age).first }
 
       it 'find by age trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
   end
