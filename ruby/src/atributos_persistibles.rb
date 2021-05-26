@@ -28,11 +28,87 @@ class AtributosPersistibles
     nil
   end
 
+  def dame_los_many()
+    atributos.filter{|a| a[:relation] == "has_many"}
+  end
+
   def dame_el_hash(objeto)
-    atributos.inject({}) do |nuevo_hash, col|
+    atributos.filter{|a| a[:relation] == "has_one"}.inject({}) do |nuevo_hash, col|
+      tipo_atributo = col[:tipo]
+
       valor = objeto.instance_variable_get "@#{col[:named]}"
-      nuevo_hash[col[:named]] ||= valor
+      if es_tipo_primitivo? tipo_atributo
+        a_guardar = valor
+        nuevo_hash[col[:named]] ||= a_guardar
+      else
+        #Guardamos el id del objeto (tipo no primitivo)
+        if(valor.class!=NilClass)
+          valor.save!
+          a_guardar = valor.id
+          nuevo_hash[col[:named]] ||= a_guardar
+        end
+      end
       nuevo_hash
+    end
+  end
+
+  def es_tipo_primitivo?(tipo)
+    tipos_primitivos = [String, Numeric, Boolean, FalseClass, TrueClass, Integer]
+    ## TODO: Mejorar --> ver que pasas con boolean, funciona como esta ahora
+    tipos_primitivos.include? tipo
+  end
+
+  def refresh!(objeto, una_fila)
+    #obtengo la fila con el id
+    #una_fila = objeto.class.find_by_id_from_table(objeto.id)
+    # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
+    # (casteado desde string) que es @algo ej @first_name
+    #puts una_fila
+    #puts atributos
+    una_fila.each do |key, value|
+      class_atributo = String
+      if(key.to_s != "id")
+        class_atributo = atributos.find { |a| a[:named] == key }[:tipo]
+      end
+
+      if es_tipo_primitivo? class_atributo
+        objeto.instance_variable_set("@#{key}", value)
+      else
+        #A mejorar esta parte e identitificar porque en los tests es nulo
+        valor_aux = Kernel.const_get(class_atributo.to_s.to_sym).new
+        valor_aux.id = value
+        valor_aux.refresh!
+        objeto.instance_variable_set("@#{key}", valor_aux)
+      end
+    end
+
+    atributos_has_many = dame_los_many
+    #puts atributos_has_many
+
+    atributos_has_many.each do |attribute|
+
+      table_name = "#{objeto.class.to_s}-#{attribute[:named].to_s}"
+      tabla_atributo_has_many = TADB::DB.table(table_name)
+      arreglo = []
+
+      tipo = attribute[:tipo]
+      if es_tipo_primitivo? tipo
+        tabla_atributo_has_many.entries.each do |fila|
+          arreglo.push(fila[:value])
+        end
+      else
+        tabla_atributo_has_many.entries.each do |fila|
+
+          #arreglo.push(fila[:value])
+          valor_aux = Kernel.const_get(tipo.to_s.to_sym).new
+          valor_aux.id = fila[:value]
+          valor_aux.refresh!
+          arreglo.push(valor_aux)
+        end
+      end
+
+      objeto.instance_variable_set("@#{attribute[:named]}", arreglo)
+      #puts tabla_atributo_has_many.entries
     end
   end
 end

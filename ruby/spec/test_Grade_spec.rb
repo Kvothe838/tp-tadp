@@ -1,15 +1,23 @@
-# frozen_string_literal: true
+
 
 describe 'ORM' do
   let(:first_name) { 'Kal' }
-  let(:last_name) { 'El'  }
+  let(:last_name) { 'El' }
   let(:age) { 30 }
-
+  let(:grade) { Grade.new }
+  let(:notes) { [] }
+  let(:apodos) { [] }
+  let(:grados) { [] }
   let(:persona) do
     persona = Person.new
     persona.first_name = first_name
     persona.last_name = last_name
     persona.age = age
+    persona.grade = grade
+    persona.grade.value = 1
+    persona.notes = notes
+    persona.apodos = apodos
+    persona.grados = grados
     persona
   end
 
@@ -22,13 +30,17 @@ describe 'ORM' do
   end
 
   after do
-    TADB::DB.clear_all
+    #TADB::DB.clear_all
   end
 
   context 'crea correctamente una persona como admin' do
     before do
       persona.is_admin = true
       persona.save!
+    end
+
+    it 'posee grade un id presente' do
+      expect(persona.grade.id).not_to be_nil
     end
 
     it 'posee un id presente' do
@@ -43,6 +55,21 @@ describe 'ORM' do
     end
   end
 
+  context 'crea estudiantes' do
+    before do
+      grade = Grade.new
+      grade.value = 1
+      persona.grados.push(grade)
+      persona.apodos.push("A").push("B")
+      persona.notes.push(5).push(6)
+      persona.save!
+      persona.refresh!
+    end
+
+    it 'Existe el registro en la tabla' do
+    end
+  end
+
   context 'Testeando refresh!' do
     let(:first_name) { 'Kramer' }
     let(:last_name) { 'Kramer'  }
@@ -50,12 +77,51 @@ describe 'ORM' do
     let(:new_first_name) { 'Fulanito' }
     let(:new_last_name) { 'Cosme'  }
     let(:new_age) { 40 }
+    let(:last_note) { 3 }
+    let(:new_note) { 4 }
+    let(:grade) { Grade.new }
 
 
     subject(:refresh!) { persona.refresh! }
 
     before do
+      persona.grade.value = last_note
       persona.save!
+    end
+
+    context 'cambiando la nota del grade' do
+      it 'devuelve el nuevo grade' do
+        persona.grade.value = new_note
+        expect(persona.grade.value).to eq(new_note)
+        refresh!
+        expect(persona.grade.value).to eq(last_note)
+      end
+    end
+
+    context 'comparando las notas del has many' do
+      it 'compara el campo notas' do
+        persona.notes = [].push(4).push(3)
+        persona.save!
+        persona.notes = [].push(5).push(4)
+        persona.refresh!
+        expect(persona.notes.first).to eq(new_note)
+        expect(persona.notes.last).to eq(last_note)
+      end
+    end
+
+    context 'comparando las grados de tipo compuesto del has many' do
+      it 'compara el campo grados' do
+        grado2 = Grade.new
+        grado2.value = 3
+        grado = Grade.new
+        grado.value = 4
+        persona.grados = [grado, grado2]
+        persona.save!
+        persona.grados = [grado2, grado]
+        persona.refresh!
+        expect(persona.grados.first.value).to eq(new_note)
+        expect(persona.grados.last.value).to eq(last_note)
+      end
     end
 
     context 'cambiando solo el last_name' do
@@ -120,11 +186,14 @@ describe 'ORM' do
     let(:first_name) { 'John' }
     let(:last_name) { 'Smith'  }
     let(:age) { 69 }
+    let(:grade) { Grade.new }
     let!(:john_wayne) do
       otra_persona = Person.new
       otra_persona.last_name = 'Wayne'
       otra_persona.first_name = 'John'
       otra_persona.age = 96
+      otra_persona.grade = Grade.new
+      otra_persona.grade.value = 2
       otra_persona.save!
       otra_persona
     end
@@ -152,6 +221,7 @@ describe 'ORM' do
     let(:first_name) { 'Esponja' }
     let(:last_name) { 'Bob'  }
     let(:age) { 20 }
+    let(:grade) { grade = Grade.new }
 
     before do
       persona.save!
@@ -196,13 +266,12 @@ describe 'ORM' do
     let(:first_name) { 'Esponja' }
     let(:last_name) { 'Bob'  }
     let(:age) { 20 }
+    let(:notas) { Grade.new }
 
     subject(:validar) { persona.send(:validar!) }
 
     context 'Cuando no hay errores' do
       it 'crea a Bob Esponja sin errores' do
-        persona.grade = Grade.new
-        persona.grade.value = 2
         persona.save!
         expect(validar).to be_nil
       end
