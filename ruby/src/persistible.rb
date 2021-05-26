@@ -13,6 +13,11 @@ module Persistible
     klass.extend(ClassMethods)
   end
 
+  def initialize
+    attr_persistibles.dame_los_many.each do |attribute|
+      self.instance_variable_set("@#{attribute[:named]}", [])
+    end
+  end
 
   def save!
     return if attr_persistibles.nil?

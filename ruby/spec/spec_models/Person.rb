@@ -15,8 +15,6 @@ class Person
   has_many String, named: :apodos
   has_many Grade, named: :grados
 
-  attr_accessor :saraza
-
   def initialize
     super
     self.is_admin = false
