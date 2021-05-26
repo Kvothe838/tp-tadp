@@ -15,12 +15,16 @@ class AtributosPersistibles
   end
 
   def validar!(objeto)
-    atributos.each do |atributo|
+    dame_los_one.each do |atributo|
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
 
-      unless valor_atributo_instancia.is_a? clase_correcta_atributo
+      puts "Atributo: #{atributo}"
+      puts "Valor: #{es_tipo_primitivo?(clase_correcta_atributo)}"
+      puts "Instancia: #{valor_atributo_instancia.class}"
+
+      unless ((valor_atributo_instancia == nil && !es_tipo_primitivo?(clase_correcta_atributo)) || valor_atributo_instancia.is_a?(clase_correcta_atributo))
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
         raise TipoIncorrectoException.new mensaje_exception
       end
@@ -32,8 +36,12 @@ class AtributosPersistibles
     atributos.filter{|a| a[:relation] == "has_many"}
   end
 
+  def dame_los_one()
+    atributos.filter{|a| a[:relation] == "has_one"}
+  end
+
   def dame_el_hash(objeto)
-    atributos.filter{|a| a[:relation] == "has_one"}.inject({}) do |nuevo_hash, col|
+    dame_los_one.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
 
       valor = objeto.instance_variable_get "@#{col[:named]}"
@@ -53,8 +61,7 @@ class AtributosPersistibles
   end
 
   def es_tipo_primitivo?(tipo)
-    tipos_primitivos = [String, Numeric, Boolean, FalseClass, TrueClass, Integer]
-    ## TODO: Mejorar --> ver que pasas con boolean, funciona como esta ahora
+    tipos_primitivos = [String, Numeric, Boolean, Integer]
     tipos_primitivos.include? tipo
   end
 
