@@ -20,9 +20,9 @@ class AtributosPersistibles
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
 
-      puts "Atributo: #{atributo}"
-      puts "Valor: #{es_tipo_primitivo?(clase_correcta_atributo)}"
-      puts "Instancia: #{valor_atributo_instancia.class}"
+      #puts "Atributo: #{atributo}"
+      #puts "Valor: #{es_tipo_primitivo?(clase_correcta_atributo)}"
+      #puts "Instancia: #{valor_atributo_instancia.class}"
 
       unless ((valor_atributo_instancia == nil && !es_tipo_primitivo?(clase_correcta_atributo)) || valor_atributo_instancia.is_a?(clase_correcta_atributo))
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
@@ -41,6 +41,8 @@ class AtributosPersistibles
   end
 
   def dame_el_hash(objeto)
+    #puts "clase dame hash #{objeto.class}"
+    #puts dame_los_one
     dame_los_one.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
 
@@ -51,7 +53,10 @@ class AtributosPersistibles
       else
         #Guardamos el id del objeto (tipo no primitivo)
         if(valor.class!=NilClass)
+          #puts "Clase: #{valor.class.to_s}"
+          #puts "Id: #{valor.id}"
           valor.save!
+          #puts "Id2: #{valor.id}"
           a_guardar = valor.id
           nuevo_hash[col[:named]] ||= a_guardar
         end
