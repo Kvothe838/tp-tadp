@@ -17,6 +17,12 @@ module Persistible
     attr_persistibles.dame_los_many.each do |attribute|
       self.instance_variable_set("@#{attribute[:named]}", [])
     end
+
+    attr_persistibles.atributos.each do |attribute|
+      if(attribute[:default] != nil)
+        self.instance_variable_set("@#{attribute[:named]}", attribute[:default])
+      end
+    end
   end
 
   def save!

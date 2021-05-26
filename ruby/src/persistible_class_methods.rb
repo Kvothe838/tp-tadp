@@ -44,18 +44,18 @@ module Persistible
       validates
     end
 
-    def has_many(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil)
-      has_field(tipo, named, no_blank, from, to, validate, "has_many")
+    def has_many(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil, default: nil)
+      has_field(tipo, named, no_blank, from, to, validate, "has_many", default)
     end
 
-    def has_one(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil)
-      has_field(tipo, named, no_blank, from, to, validate, "has_one")
+    def has_one(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil, default: nil)
+      has_field(tipo, named, no_blank, from, to, validate, "has_one", default)
     end
 
-    def has_field(tipo, named, no_blank, from, to, validate, relation)
+    def has_field(tipo, named, no_blank, from, to, validate, relation,default)
       validates = get_validates(no_blank, from, to, validate)
 
-      #puts "Self: #{self}"
+
       #puts "Ancestors: #{self.ancestors}"
       ancestors_persistibles = self.ancestors.filter {|a| a.include? (Persistible)}
       #puts "Inicio #{ancestors_persistibles}"
@@ -74,7 +74,7 @@ module Persistible
       end
 
       unless tabla_clase.repite_columna(named)
-        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation])))
+        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
         define_find_by_method(named)
       end
     end
