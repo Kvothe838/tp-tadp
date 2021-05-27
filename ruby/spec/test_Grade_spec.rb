@@ -1,6 +1,21 @@
 
 
 describe 'ORM' do
+  def comparar_persona(persona, persona2)
+    expect(persona.id).to eq(persona2.id)
+    expect(persona.first_name).to eq(persona2.first_name)
+    expect(persona.last_name).to eq(persona2.last_name)
+    expect(persona.age).to eq(persona2.age)
+    expect(persona.is_admin).to eq(persona2.is_admin)
+    if(persona.grade != nil)
+      expect(persona.grade.id).to eq(persona2.grade.id)
+      expect(persona.grade.value).to eq(persona2.grade.value)
+    end
+    expect(persona.notes.length).to eq(persona2.notes.length)
+    expect(persona.apodos.length).to eq(persona2.apodos.length)
+    expect(persona.grados.length).to eq(persona2.grados.length)
+  end
+
   let(:first_name) { 'Kal' }
   let(:last_name) { 'El' }
   let(:age) { 30 }
@@ -209,11 +224,11 @@ describe 'ORM' do
     end
 
     it 'Contiene a John Wayne' do
-      expect(all_instances.first.context).to eq(john_wayne.context)
+      comparar_persona(all_instances.first, john_wayne)
     end
 
     it 'Contiene a John Smith' do
-      expect(all_instances.last.context).to eq(persona.context)
+      comparar_persona(all_instances.last, persona)
     end
   end
 
@@ -233,7 +248,7 @@ describe 'ORM' do
       subject {Person.find_by_id(id).first }
 
       it 'find by id trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -241,7 +256,7 @@ describe 'ORM' do
       subject {Person.find_by_last_name(persona.last_name).first }
 
       it 'find by last name trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -249,7 +264,7 @@ describe 'ORM' do
       subject {Person.find_by_first_name(persona.first_name).first }
 
       it 'find by first name trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
 
@@ -257,7 +272,8 @@ describe 'ORM' do
       subject {Person.find_by_age(persona.age).first }
 
       it 'find by age trae a Bob Esponja' do
-        expect(subject.context).to eq(persona.context)
+        #expect(subject.context).to eq(persona.context)
+        comparar_persona(subject, persona)
       end
     end
   end

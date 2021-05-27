@@ -26,6 +26,7 @@ module Persistible
   end
 
   def save!
+    #puts "Inicio: #{self.class}"
     return if attr_persistibles.nil?
     attr_persistibles.validar!(self)
     @id = table.insert(attr_persistibles.dame_el_hash(self))

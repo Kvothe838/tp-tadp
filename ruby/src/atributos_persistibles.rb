@@ -59,6 +59,8 @@ class AtributosPersistibles
   end
 
   def dame_el_hash(objeto)
+    #puts "clase dame hash #{objeto.class}"
+    #puts dame_los_one
     dame_los_one.inject({}) do |nuevo_hash, col|
       tipo_atributo = col[:tipo]
 
@@ -69,7 +71,10 @@ class AtributosPersistibles
       else
         #Guardamos el id del objeto (tipo no primitivo)
         if(valor.class!=NilClass)
+          #puts "Clase: #{valor.class.to_s}"
+          #puts "Id: #{valor.id}"
           valor.save!
+          #puts "Id2: #{valor.id}"
           a_guardar = valor.id
           nuevo_hash[col[:named]] ||= a_guardar
         end
