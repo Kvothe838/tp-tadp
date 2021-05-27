@@ -212,8 +212,7 @@ describe 'ORM' do
         let(:mensaje_esperado) { 'El atributo first_name no contiene valor de clase String' }
 
         it 'falla la validacion a Bob Esponja' do
-          persona.save!
-          expect { validar }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
         end
       end
 
@@ -223,23 +222,13 @@ describe 'ORM' do
 
         it 'falla la validacion a Bob Esponja' do
           persona.is_admin = is_admin
-          persona.save!
-          expect { validar }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
         end
       end
     end
   end
 
   context 'Errores en la creacion de PersonWithGrades' do
-    let(:persona_con_grades) do
-      persona_con_grades = PersonWithGrades.new
-      persona_con_grades.full_name = 'Juan Gómez'
-      persona_con_grades
-    end
-
-    subject(:validar) { persona_con_grades.send(:validar!) }
-    subject(:save) { persona_con_grades.send(:save!) }
-
     context 'cuando el grades es un array con tipos correctos' do
       let(:grades){
         one_grade = Grade.new
@@ -251,28 +240,61 @@ describe 'ORM' do
 
       it 'pasa la validacion Juan Gómez' do
         persona_con_grades = PersonWithGrades.new
+        persona_con_grades.full_name = 'Juan Gómez'
         persona_con_grades.grades = grades
-        save
-        expect(validar).to be_nil
+        persona_con_grades.save!
+        expect(persona_con_grades.send(:validar!)).to be_nil
       end
     end
 
     context 'cuando el grades es un array con tipos incorrectos' do
-      let(:grades){
-        one_grade = Grade.new
-        one_grade.value = true
-        another_grade = Grade.new
-        another_grade.value = "sarasa"
-        grades = [one_grade, another_grade]
-        grades
-      }
-      let(:mensaje_esperado){"El atributo grades contiene al menos un elemento que no es de clase Grade"}
-
-      it 'pasa la validacion Juan Gómez' do
+      it 'no pasa la validación con dos Student en grades' do
         persona_con_grades = PersonWithGrades.new
-        persona_con_grades.grades = grades
-        puts "Grades: #{persona_con_grades.grades}"
-        expect { save }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+        persona_con_grades.full_name = 'Juan Gómez'
+        one_student = Student.new
+        one_student.full_name = "Juan Gomez"
+        other_student = Student.new
+        other_student.full_name = "sarasa"
+        persona_con_grades.grades = [one_student, other_student]
+        mensaje_esperado = "El atributo grades contiene al menos un elemento que no es de clase Grade"
+        expect { persona_con_grades.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+      end
+
+      it 'no pasa la validación con un Grade y un Student en grades' do
+        persona_con_grades = PersonWithGrades.new
+        persona_con_grades.full_name = 'Juan Gómez'
+        one_student = Student.new
+        one_student.full_name = "Juan Gomez"
+        one_grade = Grade.new
+        one_grade.value = "sarasa"
+        persona_con_grades.grades = [one_grade, one_student]
+        mensaje_esperado = "El atributo value no contiene valor de clase Numeric"
+        expect { persona_con_grades.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+      end
+
+      it 'no pasa la validación con un Student y un Grade en grades' do
+        persona_con_grades = PersonWithGrades.new
+        persona_con_grades.full_name = 'Juan Gómez'
+        one_student = Student.new
+        one_student.full_name = "Juan Gomez"
+        one_grade = Grade.new
+        one_grade.value = "sarasa"
+        persona_con_grades.grades = [one_student, one_grade]
+        mensaje_esperado = "El atributo grades contiene al menos un elemento que no es de clase Grade"
+        expect { persona_con_grades.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+      end
+
+      it 'no pasa la validación con un PersonWithStudents' do
+        persona_con_students = PersonWithStudents.new
+        persona_con_students.full_name = 'Juan Gómez'
+        one_student = Student.new
+        one_student.full_name = "Juan Gomez"
+        one_grade = Grade.new
+        one_grade.value = "sarasa"
+        one_student.grade = one_grade
+        persona_con_students.students = [one_student]
+        mensaje_esperado = "El atributo value no contiene valor de clase Numeric"
+        expect { persona_con_students.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
       end
     end
   end

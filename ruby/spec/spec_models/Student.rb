@@ -18,3 +18,9 @@ class PersonWithGrades
   include OtherPerson
   has_many Grade, named: :grades
 end
+
+class PersonWithStudents
+  include Persistible
+  include OtherPerson
+  has_many Student, named: :students
+end
