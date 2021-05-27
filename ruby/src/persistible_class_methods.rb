@@ -97,7 +97,8 @@ module Persistible
     end
 
     def respond_to_missing?(m, include_private = false)
-      m.to_s.start_with?('find_by_') || super
+      condicion = m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
+      condicion || super
     end
 
     def attr_persistibles
