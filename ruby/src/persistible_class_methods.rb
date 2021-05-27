@@ -78,7 +78,6 @@ module Persistible
 
       unless tabla_clase.repite_columna(named)
         tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
-        # define_find_by_method(named)
       end
     end
 
@@ -89,20 +88,15 @@ module Persistible
     def method_missing(m, *args, &block)
       condicion = m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
       if condicion
-        all_instances!.filter { |instancia|
-          if(args.size < 2)
-            instancia.send(Regexp.last_match(1)) === args[0]
-          else
-            instancia.send(Regexp.last_match(1), *args[1,args.size])  === args[0]
-          end
-        }
+        all_instances!.filter do |instancia|
+          instancia.send(Regexp.last_match(1), *args[1,args.size])  === args[0]
+        end
       else
         super
       end
     end
 
     def respond_to_missing?(m, include_private = false)
-      puts "D::::"
       m.to_s.start_with?('find_by_') || super
     end
 
