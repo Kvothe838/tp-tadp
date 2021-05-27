@@ -39,15 +39,17 @@ describe 'ORM' do
 
       student2 = AssistantProfessor.new
       grade2 = Grade.new
-      grade2.value = 1
-      student2.full_name = "Pepe"
+      grade2.value = 9
+      student2.full_name = 'Pepe Papa'
       student2.grade = grade2
-      student2.type = "Wii"
+      student2.type = 'Wii'
       student2.save!
+
     end
 
     it 'Ver all instances' do
       expect(OtherPerson.all_instances!.length).to be 2
     end
+
   end
 end

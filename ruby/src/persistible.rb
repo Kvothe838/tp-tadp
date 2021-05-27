@@ -73,24 +73,6 @@ module Persistible
     @id = nil
   end
 
-  #TODO: Ver como mover a ClassMethods
-  self.class.class_eval do
-    def define_find_by_method(nombre_columna)
-      self.class.define_method("find_by_#{nombre_columna}") do |arg|
-        #puts all_instances!
-        all_instances!.filter { |instancia|
-          #puts arg
-          #puts nombre_columna
-          #puts instancia.age
-          instancia.instance_variable_get("@#{nombre_columna}") == arg }
-      end
-    end
-
-    unless self.class.instance_methods.include?(:find_by_id)
-      define_find_by_method('id')
-    end
-  end
-
   private
 
   def validar!

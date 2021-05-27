@@ -52,7 +52,7 @@ module Persistible
       has_field(tipo, named, no_blank, from, to, validate, "has_one", default)
     end
 
-    def has_field(tipo, named, no_blank, from, to, validate, relation,default)
+    def has_field(tipo, named, no_blank, from, to, validate, relation, default)
       validates = get_validates(no_blank, from, to, validate)
 
 
@@ -78,12 +78,32 @@ module Persistible
 
       unless tabla_clase.repite_columna(named)
         tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
-        define_find_by_method(named)
+        # define_find_by_method(named)
       end
     end
 
     def find_by_id_from_table(id)
       table.entries.find { |fila| fila[:id] == id }
+    end
+
+    def method_missing(m, *args, &block)
+      condicion = m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
+      if condicion
+        all_instances!.filter { |instancia|
+          if(args.size < 2)
+            instancia.send(Regexp.last_match(1)) === args[0]
+          else
+            instancia.send(Regexp.last_match(1), *args[1,args.size])  === args[0]
+          end
+        }
+      else
+        super
+      end
+    end
+
+    def respond_to_missing?(m, include_private = false)
+      puts "D::::"
+      m.to_s.start_with?('find_by_') || super
     end
 
     def attr_persistibles
