@@ -299,8 +299,7 @@ describe 'ORM' do
         let(:mensaje_esperado) { 'El atributo first_name no contiene valor de clase String' }
 
         it 'falla la validacion a Bob Esponja' do
-          persona.save!
-          expect { validar }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
         end
       end
 
@@ -310,8 +309,7 @@ describe 'ORM' do
 
         it 'falla la validacion a Bob Esponja' do
           persona.is_admin = is_admin
-          persona.save!
-          expect { validar }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
         end
       end
     end
