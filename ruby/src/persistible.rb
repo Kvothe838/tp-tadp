@@ -27,6 +27,7 @@ module Persistible
 
   def save!
     return if attr_persistibles.nil?
+    attr_persistibles.validar!(self)
     @id = table.insert(attr_persistibles.dame_el_hash(self))
 
     attr_persistibles_has_many = attr_persistibles.dame_los_many()

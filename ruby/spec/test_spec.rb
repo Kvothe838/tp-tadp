@@ -229,4 +229,51 @@ describe 'ORM' do
       end
     end
   end
+
+  context 'Errores en la creacion de PersonWithGrades' do
+    let(:persona_con_grades) do
+      persona_con_grades = PersonWithGrades.new
+      persona_con_grades.full_name = 'Juan Gómez'
+      persona_con_grades
+    end
+
+    subject(:validar) { persona_con_grades.send(:validar!) }
+    subject(:save) { persona_con_grades.send(:save!) }
+
+    context 'cuando el grades es un array con tipos correctos' do
+      let(:grades){
+        one_grade = Grade.new
+        one_grade.value = 10
+        another_grade = Grade.new
+        another_grade.value = 7
+        [one_grade, another_grade]
+      }
+
+      it 'pasa la validacion Juan Gómez' do
+        persona_con_grades = PersonWithGrades.new
+        persona_con_grades.grades = grades
+        save
+        expect(validar).to be_nil
+      end
+    end
+
+    context 'cuando el grades es un array con tipos incorrectos' do
+      let(:grades){
+        one_grade = Grade.new
+        one_grade.value = true
+        another_grade = Grade.new
+        another_grade.value = "sarasa"
+        grades = [one_grade, another_grade]
+        grades
+      }
+      let(:mensaje_esperado){"El atributo grades contiene al menos un elemento que no es de clase Grade"}
+
+      it 'pasa la validacion Juan Gómez' do
+        persona_con_grades = PersonWithGrades.new
+        persona_con_grades.grades = grades
+        puts "Grades: #{persona_con_grades.grades}"
+        expect { save }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+      end
+    end
+  end
 end

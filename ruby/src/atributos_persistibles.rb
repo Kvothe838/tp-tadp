@@ -13,6 +13,10 @@ class AtributosPersistibles
   def agregar_columna!(columna)
     @atributos << columna
   end
+  
+  def es_valor_correcto_segun_clase(valor, clase)
+    (valor.nil? && !es_tipo_primitivo?(clase)) || valor.is_a?(clase)
+  end
 
   def validar!(objeto)
     dame_los_one.each do |atributo|
@@ -20,12 +24,36 @@ class AtributosPersistibles
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
 
-      puts "Atributo: #{atributo}"
-      puts "Valor: #{es_tipo_primitivo?(clase_correcta_atributo)}"
-      puts "Instancia: #{valor_atributo_instancia.class}"
-
-      unless ((valor_atributo_instancia == nil && !es_tipo_primitivo?(clase_correcta_atributo)) || valor_atributo_instancia.is_a?(clase_correcta_atributo))
+      unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
+        raise TipoIncorrectoException.new mensaje_exception
+      end
+    end
+    dame_los_many.each do |atributo|
+      nombre_atributo = atributo[:named]
+      valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
+      valor2_atributo_instancia = objeto.instance_variable_get "@full_name"
+      puts "variables instancia: #{objeto.instance_variables}"
+      puts "nombre_atributo: #{nombre_atributo}"
+      puts "valor_atributo_instancia: #{valor_atributo_instancia}"
+      puts "valor2_atributo_instancia: #{valor2_atributo_instancia}"
+      clase_correcta_atributo = atributo[:tipo]
+
+      son_correctos_todos_elementos = true
+
+      valor_atributo_instancia.each do |elemento_array|
+        puts "Elemento: #{elemento_array}"
+        #Si un elemento no es válido, la concatenación de && da false. Si todos son válidos, da true.
+        son_correctos_todos_elementos = son_correctos_todos_elementos && es_valor_correcto_segun_clase(elemento_array, clase_correcta_atributo)
+
+        #Cascadeo si no es tipo primitivo.
+        unless es_tipo_primitivo? clase_correcta_atributo
+          son_correctos_todos_elementos = son_correctos_todos_elementos && elemento_array.validar!
+        end
+      end
+
+      unless son_correctos_todos_elementos
+        mensaje_exception = "El atributo #{nombre_atributo} contiene al menos un elemento que no es de clase #{clase_correcta_atributo}"
         raise TipoIncorrectoException.new mensaje_exception
       end
     end
