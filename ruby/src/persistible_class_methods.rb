@@ -86,10 +86,9 @@ module Persistible
     end
 
     def method_missing(m, *args, &block)
-      condicion = m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
-      if condicion
+      if es_find_by(m)
         all_instances!.filter do |instancia|
-          instancia.send(Regexp.last_match(1), *args[1,args.size])  === args[0]
+          instancia.send(m.to_s['find_by_'.length, m.to_s.length], *args[1, args.size]) === args[0]
         end
       else
         super
@@ -97,9 +96,10 @@ module Persistible
     end
 
     def respond_to_missing?(m, include_private = false)
-      condicion = m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
-      condicion || super
+      es_find_by(m) || super
     end
+
+
 
     def attr_persistibles
       @attr_persistibles ||= AtributosPersistibles.new(name)
@@ -107,6 +107,12 @@ module Persistible
 
     def table
       @table ||= TADB::DB.table(name)
+    end
+
+    private
+
+    def es_find_by(m)
+      m.to_s =~ /find_by_(.*)/ && method_defined?(Regexp.last_match(1))
     end
   end
 end
