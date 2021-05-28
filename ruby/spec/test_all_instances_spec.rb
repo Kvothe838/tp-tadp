@@ -43,4 +43,6 @@ describe 'test_all_instances' do
     expect(instances.length).to be 1
     expect(instances.any? { |instance| instance.x == 3 && instance.y == 8 }).to be true
   end
+
+  #TODO Los mensajes all_instances, al ser enviados a una superclase o mixin, traen también todas las instancias de sus descendientes.
 end

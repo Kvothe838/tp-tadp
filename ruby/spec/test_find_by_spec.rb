@@ -48,5 +48,7 @@ describe 'test_find_by' do
       comparar_students(esponjas.last, otro_student)
     end
 
+    #TODO Añadir tests find_by con composición y herencia
+    #TODO Los mensajes find_by, al ser enviados a una superclase o mixin, traen también todas las instancias de sus descendientes.
   end
 end
