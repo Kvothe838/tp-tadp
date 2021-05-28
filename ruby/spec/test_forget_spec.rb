@@ -4,9 +4,6 @@ require_relative 'spec_models/save-refresh-forget/Student.rb'
 require_relative 'spec_models/save-refresh-forget/Automovil.rb'
 
 describe 'test_forget' do
-  before do
-    TADB::DB.clear_all
-  end
 
   #TODO Fijarse si tiene que cascadear
   it 'crea una persona' do

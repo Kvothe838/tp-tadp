@@ -12,7 +12,6 @@ module Persistible
         end
       end
 
-
       table.entries.each do |una_fila|
         instancia = new
         instancia.id = una_fila[:id]
@@ -29,16 +28,16 @@ module Persistible
 
     def get_validates(no_blank, from, to, validate)
       validates = []
-      if(no_blank!=nil)
+      unless no_blank.nil?
         validates << Hash[:no_blank, no_blank]
       end
-      if(from!=nil)
+      unless from.nil?
         validates << Hash[:from, from]
       end
-      if(to!=nil)
+      unless to.nil?
         validates << Hash[:to, to]
       end
-      if(validate!=nil)
+      unless validate.nil?
         validates << Hash[:validate, validate]
       end
       validates
@@ -57,7 +56,7 @@ module Persistible
 
 
       #puts "Ancestors: #{self.ancestors}"
-      ancestors_persistibles = self.ancestors.filter {|a| a.include? (Persistible)}
+      ancestors_persistibles = self.ancestors.filter {|a| a.include?(Persistible) }
       #puts "Inicio #{ancestors_persistibles}"
 
       atributos_ancestros = []
@@ -88,7 +87,7 @@ module Persistible
     def method_missing(m, *args, &block)
       if es_find_by(m)
         all_instances!.filter do |instancia|
-          instancia.send(m.to_s['find_by_'.length, m.to_s.length], *args[1, args.size]) === args[0]
+          instancia.send(m.to_s.delete_prefix('find_by_'), *args[1, args.size]) === args[0]
         end
       else
         super
@@ -98,7 +97,6 @@ module Persistible
     def respond_to_missing?(m, include_private = false)
       es_find_by(m) || super
     end
-
 
 
     def attr_persistibles

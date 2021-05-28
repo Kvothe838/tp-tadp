@@ -19,7 +19,7 @@ module Persistible
     end
 
     attr_persistibles.atributos.each do |attribute|
-      if(attribute[:default] != nil)
+      if attribute[:default].nil?
         self.instance_variable_set("@#{attribute[:named]}", attribute[:default])
       end
     end
@@ -27,7 +27,7 @@ module Persistible
 
   def save!
     return if attr_persistibles.nil?
-    attr_persistibles.validar!(self)
+    validar!
 
     unless @id.nil?
       table.delete(@id)
@@ -35,29 +35,29 @@ module Persistible
 
     @id = table.insert(attr_persistibles.dame_el_hash(self))
 
-    attr_persistibles_has_many = attr_persistibles.dame_los_many()
+    attr_persistibles_has_many = attr_persistibles.dame_los_many
     attr_persistibles_has_many.each do |attribute|
       table_name = "#{self.class.to_s}-#{attribute[:named].to_s}"
       values = instance_variable_get("@#{attribute[:named]}")
 
-      if(values != nil)
-        hash_many = Hash[:id, @id]
-        una_tabla = TADB::DB.table(table_name)
+      next if values.nil?
 
-        #puts "Inicio: #{attribute[:tipo]} #{attribute[:named]}"
-        if attr_persistibles.es_tipo_primitivo? attribute[:tipo] #Es primitivo
-          values.each do |value|
-            otro_hash = hash_many.merge(Hash[:value, value])
-            una_tabla.insert(otro_hash)
-          end
-        else
-          values.each do |value|
-            value.save!
-            #puts value.id
-            #puts value.id.class
-            otro_hash = hash_many.merge(Hash[:value, value.id])
-            una_tabla.insert(otro_hash)
-          end
+      hash_many = Hash[:id, @id]
+      una_tabla = TADB::DB.table(table_name)
+
+      #puts "Inicio: #{attribute[:tipo]} #{attribute[:named]}"
+      if attr_persistibles.es_tipo_primitivo? attribute[:tipo] #Es primitivo
+        values.each do |value|
+          otro_hash = hash_many.merge(Hash[:value, value])
+          una_tabla.insert(otro_hash)
+        end
+      else
+        values.each do |value|
+          value.save!
+          #puts value.id
+          #puts value.id.class
+          otro_hash = hash_many.merge(Hash[:value, value.id])
+          una_tabla.insert(otro_hash)
         end
       end
     end
