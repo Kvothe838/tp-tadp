@@ -204,7 +204,7 @@ describe 'ORM' do
 
   context 'Errores en la creacion de Person' do
     let(:first_name) { 'Esponja' }
-    let(:last_name) { 'Bob'  }
+    let(:last_name) { 'Bob' }
     let(:age) { 20 }
 
     subject(:validar) { persona.send(:validar!) }
@@ -277,6 +277,7 @@ describe 'ORM' do
       it 'no pasa la validación con un Grade y un Student en grades' do
         persona_con_grades = PersonWithGrades.new
         persona_con_grades.full_name = 'Juan Gómez'
+        persona_con_grades.age = 20
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
         one_student.age = 20
@@ -290,6 +291,7 @@ describe 'ORM' do
       it 'no pasa la validación con un Student y un Grade en grades' do
         persona_con_grades = PersonWithGrades.new
         persona_con_grades.full_name = 'Juan Gómez'
+        persona_con_grades.age = 20
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
         one_student.age = 20
@@ -303,6 +305,7 @@ describe 'ORM' do
       it 'no pasa la validación con un PersonWithStudents' do
         persona_con_students = PersonWithStudents.new
         persona_con_students.full_name = 'Juan Gómez'
+        persona_con_students.age = 20
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
         one_student.age = 20
@@ -315,4 +318,61 @@ describe 'ORM' do
       end
     end
   end
+
+
+  context 'Errores en la creacion de Persona con Contenido invalido' do
+    let(:first_name) { 'Esponja' }
+    let(:last_name) { 'Bob'  }
+    let(:age) { 20 }
+
+    subject(:validar) { persona.send(:validar!) }
+
+    context 'Cuando no hay errores' do
+      it 'crea a Bob Esponja sin errores' do
+        one_grade = Grade.new
+        one_grade.value = 15
+        persona.grade = one_grade
+        persona.save!
+        expect(validar).to be_nil
+      end
+    end
+
+    context 'cuando hay errores' do
+      context 'cuando el first_name es de un contenido incorrecto' do
+        let(:first_name) { "" }
+        let(:mensaje_esperado) { 'El atributo first_name no contiene valor en los limites esperados' }
+
+        it 'falla la validacion a Bob Esponja' do
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+        end
+      end
+
+      context 'cuando la edad es  inferior al minimo' do
+        let(:age) { 10 }
+        let(:mensaje_esperado) { 'El atributo age no contiene valor en los limites esperados' }
+
+        it 'falla la validacion a Bob Esponja' do
+
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+        end
+      end
+      context 'cuando la edad es  superior al minimo' do
+        let(:age) { 110 }
+        let(:mensaje_esperado) { 'El atributo age no contiene valor en los limites esperados' }
+
+        it 'falla la validacion a Bob Esponja' do
+
+          expect { persona.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
+        end
+      end
+    end
+  end
+
+
+
+
 end
+
+
+
+

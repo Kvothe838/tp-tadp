@@ -12,7 +12,6 @@ end
 class Student
   include Persistible
   include OtherPerson
-  has_one Numeric, named: :age, from: 18, to: 100
   has_one Grade, named: :grade
 
   def promoted

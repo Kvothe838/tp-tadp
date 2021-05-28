@@ -10,7 +10,7 @@ class Person
   has_one String, named: :last_name, default: "Test"
   has_one Numeric, named: :age, from: 18, to: 100
   has_one Boolean, named: :is_admin
-  has_one Grade, named: :grade, default: Grade.new, validate: proc{value>2}
+  has_one Grade, named: :grade, default: Grade.new, validate: proc { value > 2 }
   has_many Numeric, named: :notes
   has_many String, named: :apodos
   has_many Grade, named: :grados

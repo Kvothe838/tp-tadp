@@ -19,7 +19,9 @@ module Persistible
     end
 
     attr_persistibles.atributos.each do |attribute|
-      if(attribute[:default] != nil)
+      valor_atributo = instance_variable_get("@#{attribute[:named]}")
+      if(attribute[:default] != nil && valor_atributo == nil )
+
         self.instance_variable_set("@#{attribute[:named]}", attribute[:default])
       end
     end
@@ -71,6 +73,18 @@ module Persistible
   def forget!
     table.delete(@id)
     @id = nil
+  end
+
+  def ejecutar_proc(proc)
+    puts "----PROC------"
+    puts self
+    puts self.value
+
+    puts self.instance_eval(&proc)
+    self.instance_eval(&proc)
+   #a = proc
+   #a.call
+    puts "---Fin Proc--------"
   end
 
   private

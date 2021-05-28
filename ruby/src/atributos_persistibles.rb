@@ -18,51 +18,38 @@ class AtributosPersistibles
     (valor.nil? && !es_tipo_primitivo?(clase)) || valor.is_a?(clase)
   end
 
-  def validacion_contenido(valores,objeto )
-    #puts "--------------"
-    inferior = false
-    superior = false
-    tiene_Contenido =false
-    #puts valores
-    valores.each do |limit|
+  def validacion_contenido(atributo,objeto ) #atributo
+    inferior = true
+    superior = true
+    tiene_Contenido = true
+    validate_bloque = true
+    nombre_atributo = atributo[:named]
+    validates = atributo[:validates]
+    validates.each do |limit|
 
       if (limit[:no_blank])
-        #puts "incio blank"
-        #puts limit[:no_blank]
-        #puts (objeto.instance_variable_get "@first_name")
-        tiene_Contenido = ((objeto.instance_variable_get "@first_name").to_s !=  '' )
-        #puts tiene_Contenido
-        #puts "fin blank"
+              tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
       else if (limit[:from])
-             puts objeto.instance_variable_get "@age"
-             puts "----"
-             inferior = (objeto.instance_variable_get "@age") > limit[:from]
-             #puts "Inferior Comienzo"
-             #puts limit[:from]
-             #puts objeto.instance_variable_get "@age"
-             #puts inferior
-             #puts "Inferior FIN"
+              inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
       else if (limit[:to])
-             superior = (objeto.instance_variable_get "@age") < limit[:to]
-             #puts "Superior Comienzo"
-             #puts limit[:to]
-             #puts (objeto.instance_variable_get "@age")
-             #puts superior
-             #puts "Superior FIN"
+             superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
       else if (limit[:validate])
-                puts "-VALIDATE-"
-                puts limit[:validate]
-                tiene_Contenido = true
+             puts "-VALIDATE-"
+             puts limit[:validate]
+             value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
+             validate_bloque =  value_atributo.ejecutar_proc(limit[:validate])
+
         else
           puts "No contemplado"
           end
         end
       end
     end
-      #puts "--------------"
-    tiene_Contenido = superior && inferior
-    tiene_Contenido
-  end
+    end
+    devuelve = superior && inferior && tiene_Contenido && validate_bloque
+    #tiene_Contenido = superior && inferior
+    #tiene_Contenido
+    devuelve
 end
 
   def validar!(objeto)
@@ -71,19 +58,11 @@ end
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
-      puts "----------"
-      puts nombre_atributo.to_s
-      puts (objeto.instance_variable_get "@age").is_a? Integer
-      puts clase_correcta_atributo
-      puts "-------------"
       unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
         raise TipoIncorrectoException.new mensaje_exception
       end
-
-      validacion_contenido(atributo[:validates],objeto)
-      #  puts "---------------"
-      unless validacion_contenido(atributo[:validates],objeto)
+      unless validacion_contenido(atributo,objeto)
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
         raise TipoIncorrectoException.new mensaje_exception
       end
