@@ -20,15 +20,50 @@ class AtributosPersistibles
     (valor.nil? && !es_tipo_primitivo?(clase)) || valor.is_a?(clase)
   end
 
+  def validacion_contenido(atributo,objeto ) #atributo
+    inferior = true
+    superior = true
+    tiene_Contenido = true
+    validate_bloque = true
+    nombre_atributo = atributo[:named]
+    validates = atributo[:validates]
+    validates.each do |limit|
+
+      if (limit[:no_blank])
+              tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
+      else if (limit[:from])
+              inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
+      else if (limit[:to])
+             superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
+      else if (limit[:validate])
+             value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
+             validate_bloque =  value_atributo.ejecutar_proc(limit[:validate])
+        else
+          puts "No contemplado"
+          end
+        end
+      end
+    end
+    end
+    devuelve = superior && inferior && tiene_Contenido && validate_bloque
+    #tiene_Contenido = superior && inferior
+    #tiene_Contenido
+    devuelve
+end
+
   def validar!(objeto)
+
     dame_los_one.each do |atributo|
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
-
       unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
         puts "VALOR: #{valor_atributo_instancia}"
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
+        raise TipoIncorrectoException.new mensaje_exception
+      end
+      unless validacion_contenido(atributo,objeto)
+        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
         raise TipoIncorrectoException.new mensaje_exception
       end
     end
