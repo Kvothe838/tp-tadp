@@ -34,11 +34,8 @@ class AtributosPersistibles
       else if (limit[:to])
              superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
       else if (limit[:validate])
-             puts "-VALIDATE-"
-             puts limit[:validate]
              value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
              validate_bloque =  value_atributo.ejecutar_proc(limit[:validate])
-
         else
           puts "No contemplado"
           end
