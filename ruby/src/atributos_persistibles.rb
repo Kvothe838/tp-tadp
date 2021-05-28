@@ -1,3 +1,5 @@
+require_relative './boolean'
+
 class AtributosPersistibles
   attr_accessor :atributos, :nombre
 
@@ -25,6 +27,7 @@ class AtributosPersistibles
       clase_correcta_atributo = atributo[:tipo]
 
       unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
+        puts "VALOR: #{valor_atributo_instancia}"
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
         raise TipoIncorrectoException.new mensaje_exception
       end
