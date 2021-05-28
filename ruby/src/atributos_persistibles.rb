@@ -18,14 +18,73 @@ class AtributosPersistibles
     (valor.nil? && !es_tipo_primitivo?(clase)) || valor.is_a?(clase)
   end
 
+  def validacion_contenido(valores,objeto )
+    #puts "--------------"
+    inferior = false
+    superior = false
+    tiene_Contenido =false
+    #puts valores
+    valores.each do |limit|
+
+      if (limit[:no_blank])
+        #puts "incio blank"
+        #puts limit[:no_blank]
+        #puts (objeto.instance_variable_get "@first_name")
+        tiene_Contenido = ((objeto.instance_variable_get "@first_name").to_s !=  '' )
+        #puts tiene_Contenido
+        #puts "fin blank"
+      else if (limit[:from])
+             puts objeto.instance_variable_get "@age"
+             puts "----"
+             inferior = (objeto.instance_variable_get "@age") > limit[:from]
+             #puts "Inferior Comienzo"
+             #puts limit[:from]
+             #puts objeto.instance_variable_get "@age"
+             #puts inferior
+             #puts "Inferior FIN"
+      else if (limit[:to])
+             superior = (objeto.instance_variable_get "@age") < limit[:to]
+             #puts "Superior Comienzo"
+             #puts limit[:to]
+             #puts (objeto.instance_variable_get "@age")
+             #puts superior
+             #puts "Superior FIN"
+      else if (limit[:validate])
+                puts "-VALIDATE-"
+                puts limit[:validate]
+                tiene_Contenido = true
+        else
+          puts "No contemplado"
+          end
+        end
+      end
+    end
+      #puts "--------------"
+    tiene_Contenido = superior && inferior
+    tiene_Contenido
+  end
+end
+
   def validar!(objeto)
+
     dame_los_one.each do |atributo|
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
-
+      puts "----------"
+      puts nombre_atributo.to_s
+      puts (objeto.instance_variable_get "@age").is_a? Integer
+      puts clase_correcta_atributo
+      puts "-------------"
       unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
+        raise TipoIncorrectoException.new mensaje_exception
+      end
+
+      validacion_contenido(atributo[:validates],objeto)
+      #  puts "---------------"
+      unless validacion_contenido(atributo[:validates],objeto)
+        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
         raise TipoIncorrectoException.new mensaje_exception
       end
     end

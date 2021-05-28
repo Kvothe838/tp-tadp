@@ -247,10 +247,11 @@ describe 'ORM' do
         another_grade.value = 7
         [one_grade, another_grade]
       }
-
+      let(:age) { 20 }
       it 'pasa la validacion Juan Gómez' do
         persona_con_grades = PersonWithGrades.new
         persona_con_grades.full_name = 'Juan Gómez'
+        persona_con_grades.age= 20
         persona_con_grades.grades = grades
         persona_con_grades.save!
         expect(persona_con_grades.send(:validar!)).to be_nil
@@ -261,10 +262,13 @@ describe 'ORM' do
       it 'no pasa la validación con dos Student en grades' do
         persona_con_grades = PersonWithGrades.new
         persona_con_grades.full_name = 'Juan Gómez'
+        persona_con_grades.age= 20
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
+        one_student.age= 20
         other_student = Student.new
         other_student.full_name = "sarasa"
+        other_student.age = 21
         persona_con_grades.grades = [one_student, other_student]
         mensaje_esperado = "El atributo grades contiene al menos un elemento que no es de clase Grade"
         expect { persona_con_grades.save! }.to raise_error(TipoIncorrectoException, mensaje_esperado)
@@ -275,6 +279,7 @@ describe 'ORM' do
         persona_con_grades.full_name = 'Juan Gómez'
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
+        one_student.age = 20
         one_grade = Grade.new
         one_grade.value = "sarasa"
         persona_con_grades.grades = [one_grade, one_student]
@@ -287,6 +292,7 @@ describe 'ORM' do
         persona_con_grades.full_name = 'Juan Gómez'
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
+        one_student.age = 20
         one_grade = Grade.new
         one_grade.value = "sarasa"
         persona_con_grades.grades = [one_student, one_grade]
@@ -299,6 +305,7 @@ describe 'ORM' do
         persona_con_students.full_name = 'Juan Gómez'
         one_student = Student.new
         one_student.full_name = "Juan Gomez"
+        one_student.age = 20
         one_grade = Grade.new
         one_grade.value = "sarasa"
         one_student.grade = one_grade
