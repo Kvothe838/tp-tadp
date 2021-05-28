@@ -108,7 +108,7 @@ end
         nuevo_hash[col[:named]] ||= a_guardar
       else
         #Guardamos el id del objeto (tipo no primitivo)
-        if(valor.class!=NilClass)
+        if valor.class != NilClass
           #puts "Clase: #{valor.class.to_s}"
           #puts "Id: #{valor.id}"
           valor.save!
@@ -135,7 +135,7 @@ end
     #puts atributos
     una_fila.each do |key, value|
       class_atributo = String
-      if(key.to_s != "id")
+      if key != :id
         class_atributo = atributos.find { |a| a[:named] == key }[:tipo]
       end
 

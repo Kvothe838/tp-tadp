@@ -4,9 +4,6 @@ require_relative 'spec_models/save-refresh-forget/Student.rb'
 require_relative 'spec_models/save-refresh-forget/Automovil.rb'
 
 describe 'test_refresh' do
-  before do
-    TADB::DB.clear_all
-  end
 
   it 'resetea una persona' do
     persona = Person.new

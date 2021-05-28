@@ -1,9 +1,6 @@
 require_relative 'spec_models/find_by/Student.rb'
 
 describe 'test_find_by' do
-  before do
-    TADB::DB.clear_all
-  end
 
   def comparar_students(student1, student2)
     expect(student1.id).to eq(student2.id)

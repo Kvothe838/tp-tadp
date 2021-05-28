@@ -1,9 +1,6 @@
 require_relative 'spec_models/all_instances/Point.rb'
 
 describe 'test_all_instances' do
-  before do
-    TADB::DB.clear_all
-  end
 
   it 'crea tres puntos, guarda dos y trae dos' do
     p1 = Point.new
