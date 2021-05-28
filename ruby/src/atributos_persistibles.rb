@@ -52,40 +52,39 @@ class AtributosPersistibles
 end
 
   def validar!(objeto)
-
-    dame_los_one.each do |atributo|
+    atributos.each do |atributo|
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
-      unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
-        puts "VALOR: #{valor_atributo_instancia}"
+
+      if(atributo[:relation] == "has_one")
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
-        raise TipoIncorrectoException.new mensaje_exception
-      end
-      unless validacion_contenido(atributo,objeto)
-        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
-        raise TipoIncorrectoException.new mensaje_exception
-      end
-    end
-    dame_los_many.each do |atributo|
-      nombre_atributo = atributo[:named]
-      valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
-      clase_correcta_atributo = atributo[:tipo]
+        evaluar_forma_correcta(valor_atributo_instancia, clase_correcta_atributo, mensaje_exception)
 
-
-      valor_atributo_instancia.each do |elemento_array|
-        unless es_valor_correcto_segun_clase(elemento_array, clase_correcta_atributo)
-          mensaje_exception = "El atributo #{nombre_atributo} contiene al menos un elemento que no es de clase #{clase_correcta_atributo}"
+        unless validacion_contenido(atributo,objeto)
+          mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
           raise TipoIncorrectoException.new mensaje_exception
         end
+      else
+        valor_atributo_instancia.each do |elemento_array|
+          mensaje_exception = "El atributo #{nombre_atributo} contiene al menos un elemento que no es de clase #{clase_correcta_atributo}"
+          evaluar_forma_correcta(valor_atributo_instancia, clase_correcta_atributo, mensaje_exception)
 
-        #Cascadeo si no es tipo primitivo.
-        unless es_tipo_primitivo? clase_correcta_atributo
-          elemento_array.send(:validar!)
+          #Cascadeo si no es tipo primitivo.
+          unless es_tipo_primitivo? clase_correcta_atributo || !elemento_array.respond_to?("validar!")
+            elemento_array.send(:validar!)
+          end
         end
       end
     end
+
     nil
+  end
+
+  def evaluar_forma_correcta(valor_atributo_instancia, clase_correcta_atributo, mensaje_exception)
+    unless es_valor_correcto_segun_clase(valor_atributo_instancia, clase_correcta_atributo)
+      raise TipoIncorrectoException.new mensaje_exception
+    end
   end
 
   def dame_los_many()
