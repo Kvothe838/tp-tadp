@@ -15,3 +15,11 @@ class Student_FindBy
   end
 
 end
+
+class StudentInferior_FindBy < Student_FindBy
+  has_one Numeric, named: :age
+
+  def es_mayor_de_edad
+    self.age > 18
+  end
+end
