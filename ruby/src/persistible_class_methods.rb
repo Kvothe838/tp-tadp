@@ -1,29 +1,18 @@
 module Persistible
   module ClassMethods
     def all_instances!
-      instancias = []
-      descendants.each do |descendant|
-        table_descendant = descendant.table
-        table_descendant.entries.each do |una_fila|
-          instancia = descendant.new
-          instancia.id = una_fila[:id]
-          instancia.refresh!
-          instancias << instancia
-        end
-      end
+      descendants.map { |descendant| descendant.table.entries.map { |fila| [get_instancia_by_descendant(descendant, fila)] } }.flatten
+    end
 
-      table.entries.each do |una_fila|
-        instancia = new
-        instancia.id = una_fila[:id]
-        instancia.refresh!
-        instancias << instancia
-      end
-      #puts instancias
-      instancias
+    def get_instancia_by_descendant( descendant, fila )
+      instancia = descendant.new
+      instancia.id = fila[:id]
+      instancia.refresh!
+      instancia
     end
 
     def descendants
-      ObjectSpace.each_object(Class).select { |klass| klass < self }
+      ObjectSpace.each_object(Class).select { |klass| klass <= self }
     end
 
     def get_validates(no_blank, from, to, validate)

@@ -1,6 +1,6 @@
 require_relative '../../../src/persistible'
 
-class Student
+class Student_FindBy
   include Persistible
 
   has_one String, named: :full_name
