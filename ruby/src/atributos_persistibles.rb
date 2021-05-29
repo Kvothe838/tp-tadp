@@ -207,3 +207,31 @@ end
     end
   end
 end
+
+
+
+# class AtributosPersistible
+#   attr_reader :named, :type, :validations
+#
+#   def initialize
+#     raise(NotImplementedError)
+#   end
+#
+#   def validacion_contenido()
+#     raise NotImplementedError
+#   end
+#
+#   def dame_el_valor(objeto)
+#     objeto.instance_variable_get("@#{named}")
+#   end
+# end
+#
+# class HasManyPersistible < AtributosPersistible
+#   def validacion_contenido()
+#   end
+# end
+#
+# class HasOnePersistible < AtributosPersistible
+#   def validacion_contenido(objeto)
+#   end
+# end
