@@ -1,11 +1,13 @@
 require_relative 'spec_models/find_by/Student_FindBy.rb'
-
+require_relative 'spec_models/find_by/person_find_by.rb'
+require_relative 'spec_models/find_by/assistant_find_by.rb'
 describe 'test_find_by' do
 
   def comparar_students(student1, student2)
     expect(student1.id).to eq(student2.id)
     expect(student1.full_name).to eq(student2.full_name)
     expect(student1.grade).to eq(student2.grade)
+    expect(student1.materias_desaprobadas).to eq(student2.materias_desaprobadas)
   end
 
   let(:full_name) { 'Bob Esponja' }
@@ -13,12 +15,14 @@ describe 'test_find_by' do
     un_student = Student_FindBy.new
     un_student.full_name = full_name
     un_student.grade = 9
+    un_student.materias_desaprobadas = 21
     un_student
   end
   let(:otro_student) do
     otro_student = Student_FindBy.new
     otro_student.full_name = "Gari Esponja"
     otro_student.grade = 2
+    otro_student.materias_desaprobadas = 20
     otro_student
   end
   let(:un_student_inferior) do
@@ -26,6 +30,7 @@ describe 'test_find_by' do
     un_student_inferior.full_name = "Juan Esponja"
     un_student_inferior.grade = 11
     un_student_inferior.age = 19
+    un_student_inferior.materias_desaprobadas = 20
     un_student_inferior
   end
   let(:otro_student_inferior) do
@@ -33,7 +38,15 @@ describe 'test_find_by' do
     otro_student_inferior.full_name = "Pedro Superman"
     otro_student_inferior.grade = 3
     otro_student_inferior.age = 17
+    otro_student_inferior.materias_desaprobadas = 20
     otro_student_inferior
+  end
+  let(:un_asistente) do
+    un_asistente = Assistant_FindBy.new
+    un_asistente.full_name = "Pedro Superman"
+    un_asistente.grade = 3
+    un_asistente.materias_desaprobadas = 25
+    un_asistente
   end
 
   context 'find_by_<what>' do
@@ -132,6 +145,12 @@ describe 'test_find_by' do
 
     it 'find_by_es_mayor_de_edad de Student rompe' do
       expect{Student_FindBy.find_by_es_mayor_de_edad(true)}.to raise_error(NoMethodError)
+    end
+    it 'Herencia Superclase y Mixin' do
+      un_asistente.saraza = 0
+      un_asistente.save!
+      personas = Person_FindBy.find_by_materias_desaprobadas_mayor_a(true, 20)
+      expect(personas.size).to be 2
     end
   end
 end
