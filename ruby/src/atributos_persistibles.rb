@@ -29,18 +29,27 @@ class AtributosPersistibles
     validates = atributo[:validates]
     validates.each do |limit|
 
-      if (limit[:no_blank])
+      if (limit[:no_blank] && atributo[:relation] == "has_one")
               tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
-      else if (limit[:from])
+      else if (limit[:from] && atributo[:relation] == "has_one")
               inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
-      else if (limit[:to])
+      else if (limit[:to] && atributo[:relation] == "has_one")
              superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
            else if (limit[:validate])
-                  #puts "Objeto: #{objeto}"
-             value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
-             validate_bloque =  objeto.ejecutar_proc(limit[:validate])
-        else
-          puts "No contemplado"
+             #puts "Objeto: #{objeto}"
+             if(atributo[:relation] == "has_one")
+               validate_bloque =  objeto.ejecutar_proc(limit[:validate])
+             else
+               value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
+               value_atributo.each do |elemento_array|
+                 validate_bloque =  elemento_array.ejecutar_proc(limit[:validate])
+                 if(!validate_bloque)
+                   break
+                 end
+               end
+             end
+          else
+            puts "No contemplado"
           end
         end
       end
@@ -62,14 +71,10 @@ end
       if(atributo[:relation] == "has_one")
         mensaje_exception = "El atributo #{nombre_atributo} no contiene valor de clase #{clase_correcta_atributo}"
         evaluar_forma_correcta(valor_atributo_instancia, clase_correcta_atributo, mensaje_exception)
-
-        unless validacion_contenido(atributo,objeto)
-          mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
-          raise TipoIncorrectoException.new mensaje_exception
-        end
       else
         #puts "Valor has many: #{valor_atributo_instancia}"
         valor_atributo_instancia.each do |elemento_array|
+          #puts "Elemento: #{elemento_array.class.attr_persistibles.atributos}"
           mensaje_exception = "El atributo #{nombre_atributo} contiene al menos un elemento que no es de clase #{clase_correcta_atributo}"
           evaluar_forma_correcta(elemento_array, clase_correcta_atributo, mensaje_exception)
 
@@ -79,6 +84,11 @@ end
             elemento_array.send(:validar!)
           end
         end
+      end
+
+      unless validacion_contenido(atributo,objeto)
+        mensaje_exception = "El atributo #{nombre_atributo} no contiene valor en los limites esperados"
+        raise TipoIncorrectoException.new mensaje_exception
       end
     end
 
