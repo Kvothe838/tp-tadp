@@ -11,3 +11,7 @@ class Point_AllInstances
     self.y = self.y + other.y
   end
 end
+
+class TridimentionalPoint_AllInstances < Point_AllInstances
+  has_one Numeric, named: :z
+end

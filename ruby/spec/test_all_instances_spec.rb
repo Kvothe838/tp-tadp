@@ -41,5 +41,27 @@ describe 'test_all_instances' do
     expect(instances.any? { |instance| instance.x == 3 && instance.y == 8 }).to be true
   end
 
+  it 'crea un Point y un TridimentionalPoint, pide all_instances! y devuelve 2' do
+    p1 = Point_AllInstances.new
+    p1.x = 2
+    p1.y = 5
+    p1.save!
+    p2 = TridimentionalPoint_AllInstances.new
+    p2.x = 1
+    p2.y = 3
+    p2.z = 5
+    p2.save!
+
+    point_instances = Point_AllInstances.all_instances!
+    tridimentionalPoint_instances = TridimentionalPoint_AllInstances.all_instances!
+
+    expect(point_instances.length).to be 2
+    expect(point_instances.any? { |instance| instance.x == 2 && instance.y == 5 }).to be true
+    expect(point_instances.any? { |instance| instance.x == 1 && instance.y == 3 && instance.z = 5 }).to be true
+
+    expect(tridimentionalPoint_instances.length).to be 1
+    expect(tridimentionalPoint_instances.any? { |instance| instance.x == 1 && instance.y == 3 && instance.z = 5 }).to be true
+  end
+
   #TODO Los mensajes all_instances, al ser enviados a una superclase o mixin, traen también todas las instancias de sus descendientes.
 end

@@ -14,13 +14,12 @@ describe 'test_has_one' do
     expect(atributos[3][:named]).to be :admin
   end
 
-  #Test para cuando se implemente.
-  # it 'Pisa el tipo del atributo repetido' do
-  #   class Person
-  #     has_one String, named: :age
-  #   end
-  #
-  #   atributos = Person_HasOne.attr_persistibles.atributos
-  #   expect(atributos[2][:tipo]).to be String
-  # end
+  it 'Pisa el tipo del atributo repetido' do
+    class Person_HasOne
+      has_one String, named: :age
+    end
+
+    atributos = Person_HasOne.attr_persistibles.atributos
+    expect(atributos[2][:tipo]).to be String
+  end
 end
