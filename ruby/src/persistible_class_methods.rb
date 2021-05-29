@@ -1,7 +1,9 @@
 module Persistible
   module ClassMethods
     def all_instances!
-      descendants.map { |descendant| descendant.table.entries.map { |fila| [get_instancia_by_descendant(descendant, fila)] } }.flatten
+      descendants.flat_map do |descendant|
+        descendant.table.entries.map { |fila| get_instancia_by_descendant(descendant, fila) }
+      end
     end
 
     def get_instancia_by_descendant( descendant, fila )
@@ -89,7 +91,11 @@ module Persistible
     end
 
     def table
-      @table ||= TADB::DB.table(name)
+      @table ||= table_by_name(self)
+    end
+
+    def table_by_name(klass)
+      TADB::DB.table(klass.name)
     end
 
     private
