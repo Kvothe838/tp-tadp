@@ -1,12 +1,12 @@
-require_relative 'spec_models/validates/Grade.rb'
-require_relative 'spec_models/validates/Student.rb'
+require_relative 'spec_models/validates/Grade_Validates.rb'
+require_relative 'spec_models/validates/Student_Validates.rb'
 
 describe 'test_validates' do
   let(:student) do
-    student = Student.new
+    student = Student_Validates.new
     student.full_name = "Juan"
     student.age = 19
-    grade = Grade.new
+    grade = Grade_Validates.new
     grade.value = 5
     student.grades = [grade]
     student
@@ -19,7 +19,7 @@ describe 'test_validates' do
   end
 
   it 'crea un student con grade con formato incorrecto' do
-    grade = Grade.new
+    grade = Grade_Validates.new
     grade.value = "Test"
     student.grade = grade
 
@@ -27,10 +27,10 @@ describe 'test_validates' do
   end
 
   it 'fallo en full_name' do
-    student2 = Student.new
+    student2 = Student_Validates.new
     student2.full_name = 1
     student2.age = 19
-    grade = Grade.new
+    grade = Grade_Validates.new
     grade.value = 5
     student2.grades = [grade]
 
@@ -38,26 +38,26 @@ describe 'test_validates' do
   end
 
   it 'fallo con full_name en blanco' do
-    student2 = Student.new
+    student2 = Student_Validates.new
     student2.full_name = ""
     student2.age = 19
     expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo full_name no contiene valor en los limites esperados")
   end
 
   it 'fallo con límites de age' do
-    student2 = Student.new
+    student2 = Student_Validates.new
     student2.full_name = "Pepe"
     student2.age = 1
     expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo age no contiene valor en los limites esperados")
   end
 
   it 'fallo con el proc validate' do
-    student2 = Student.new
+    student2 = Student_Validates.new
     student2.full_name = "Pepe"
     student2.age = 19
-    grade = Grade.new
+    grade = Grade_Validates.new
     grade.value = 5
-    grade2 = Grade.new
+    grade2 = Grade_Validates.new
     grade2.value = 1
     student2.grades = [grade, grade2]
 
@@ -65,7 +65,7 @@ describe 'test_validates' do
   end
 
   it 'valores por defecto' do
-    student2 = Student.new
+    student2 = Student_Validates.new
     student2.full_name = "Pepe"
     student2.age = 19
     student2.save!

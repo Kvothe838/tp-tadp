@@ -1,6 +1,6 @@
 require_relative '../../../src/persistible'
 
-class Grade
+class Grade_Refresh
   include Persistible
 
   has_one Numeric, named: :value

@@ -1,12 +1,12 @@
-require_relative 'spec_models/save-refresh-forget/Person.rb'
-require_relative 'spec_models/save-refresh-forget/Grade.rb'
-require_relative 'spec_models/save-refresh-forget/Student.rb'
-require_relative 'spec_models/save-refresh-forget/Automovil.rb'
+require_relative 'spec_models/refresh/Person_Refresh.rb'
+require_relative 'spec_models/refresh/Grade_Refresh.rb'
+require_relative 'spec_models/refresh/Student_Refresh.rb'
+require_relative 'spec_models/refresh/Automovil_Refresh.rb'
 
 describe 'test_refresh' do
 
   it 'resetea una persona' do
-    persona = Person.new
+    persona = Person_Refresh.new
     persona.first_name = "Juan"
     persona.last_name = "Pérez"
     persona.age = 13
@@ -19,9 +19,9 @@ describe 'test_refresh' do
   end
 
   it 'resetea el grade del student' do
-    student = Student.new
+    student = Student_Refresh.new
     student.full_name = "Juan Pérez"
-    student.grade = Grade.new
+    student.grade = Grade_Refresh.new
     student.grade.value = 5
     student.save!
 
@@ -32,9 +32,9 @@ describe 'test_refresh' do
   end
 
   it 'crea un auto que hereda de automovil' do
-    auto = Auto.new
+    auto = Auto_Refresh.new
     auto.marca = 'VMW'
-    auto.rueda = Rueda.new
+    auto.rueda = Rueda_Refresh.new
     auto.rueda.marca = 'Michelin'
     auto.save!
 

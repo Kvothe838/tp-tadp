@@ -1,8 +1,8 @@
-require_relative 'spec_models/has_one/Person.rb'
+require_relative 'spec_models/has_one/Person_HasOne.rb'
 
 describe 'test_has_one' do
   it 'Agrega atributos persistibles correctamente' do
-    atributos = Person.attr_persistibles.atributos
+    atributos = Person_HasOne.attr_persistibles.atributos
     expect(atributos.length).to be 4
     expect(atributos[0][:tipo]).to be String
     expect(atributos[0][:named]).to be :first_name
