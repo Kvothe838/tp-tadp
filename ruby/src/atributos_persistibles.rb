@@ -209,9 +209,8 @@ end
 end
 
 
-
 # class AtributosPersistible
-#   attr_reader :named, :type, :validations
+#   attr_accessor :named, :type, :validations
 #
 #   def initialize
 #     raise(NotImplementedError)
@@ -224,6 +223,22 @@ end
 #   def dame_el_valor(objeto)
 #     objeto.instance_variable_get("@#{named}")
 #   end
+#
+#
+#   def crear_validaciones(from, to, no_blank, validate)
+#     validations = [type_validation]
+#     validations << from_validation(from) unless from.nil?
+#     self.validations = validations
+#   end
+#
+#   def from_validation(from)
+#   end
+#
+#   def type_validation
+#     named = self.named
+#     type = self.type
+#     Proc.new { instance_variable_get("@#{named}").is_a?(type) }
+#   end
 # end
 #
 # class HasManyPersistible < AtributosPersistible
@@ -233,5 +248,8 @@ end
 #
 # class HasOnePersistible < AtributosPersistible
 #   def validacion_contenido(objeto)
+#   end
+#
+#   def validate!
 #   end
 # end
