@@ -7,8 +7,4 @@ RSpec.configure do |config|
   config.before(:each) do
     TADB::DB.clear_all
   end
-
-  config.after(:each) do
-    TADB::DB.clear_all
-  end
 end
