@@ -1,6 +1,6 @@
 require_relative '../../../src/persistible'
 
-class Point
+class Point_AllInstances
   include Persistible
 
   has_one Numeric, named: :x

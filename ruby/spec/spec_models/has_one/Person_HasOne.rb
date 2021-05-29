@@ -1,7 +1,7 @@
 require_relative '../../../src/boolean'
 require_relative '../../../src/persistible'
 
-class Person
+class Person_HasOne
   include Persistible
 
   has_one String, named: :first_name

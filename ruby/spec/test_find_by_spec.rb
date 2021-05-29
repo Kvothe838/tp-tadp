@@ -1,4 +1,4 @@
-require_relative 'spec_models/find_by/Student.rb'
+require_relative 'spec_models/find_by/Student_FindBy.rb'
 
 describe 'test_find_by' do
 
@@ -10,13 +10,13 @@ describe 'test_find_by' do
 
   let(:full_name) { 'Bob Esponja' }
   let(:un_student) do
-    un_student = Student.new
+    un_student = Student_FindBy.new
     un_student.full_name = full_name
     un_student.grade = 9
     un_student
   end
   let(:otro_student) do
-    otro_student = Student.new
+    otro_student = Student_FindBy.new
     otro_student.full_name = "Gari Esponja"
     otro_student.grade = 2
     otro_student
@@ -30,17 +30,17 @@ describe 'test_find_by' do
     end
 
     it 'find_by_id entre dos elementos' do
-      encontrado = Student.find_by_id(un_student.id).first
+      encontrado = Student_FindBy.find_by_id(un_student.id).first
       comparar_students(encontrado, un_student)
     end
 
     it 'find_by_promoted' do
-      aprobado = Student.find_by_promoted(true).first
+      aprobado = Student_FindBy.find_by_promoted(true).first
       comparar_students(aprobado, un_student)
     end
 
     it 'find_by_last_name' do
-      esponjas = Student.find_by_has_last_name(true,'Esponja')
+      esponjas = Student_FindBy.find_by_has_last_name(true, 'Esponja')
       comparar_students(esponjas.first, un_student)
       comparar_students(esponjas.last, otro_student)
     end

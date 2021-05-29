@@ -1,13 +1,11 @@
-require_relative 'spec_models/save-refresh-forget/Person.rb'
-require_relative 'spec_models/save-refresh-forget/Grade.rb'
-require_relative 'spec_models/save-refresh-forget/Student.rb'
-require_relative 'spec_models/save-refresh-forget/Automovil.rb'
+require_relative 'spec_models/forget/Person_Forget.rb'
+require_relative 'spec_models/forget/Grade_Forget.rb'
+require_relative 'spec_models/forget/Student_Forget.rb'
+require_relative 'spec_models/forget/Automovil_Forget.rb'
 
 describe 'test_forget' do
-
-  #TODO Fijarse si tiene que cascadear
   it 'crea una persona' do
-    persona = Person.new
+    persona = Person_Forget.new
     persona.first_name = "Juan"
     persona.last_name = "Pérez"
     persona.age = 13
