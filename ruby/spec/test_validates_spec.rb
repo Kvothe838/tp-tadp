@@ -61,7 +61,7 @@ describe 'test_validates' do
     grade2.value = 1
     student2.grades = [grade, grade2]
 
-    expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo value no contiene valor en los limites esperados")
+    expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo grades no contiene valor en los limites esperados")
   end
 
   it 'valores por defecto' do
