@@ -1,4 +1,4 @@
-require_relative 'spec_models/all_instances/Point_AllInstances.rb'
+require_relative 'spec_models/all_instances/point_all_instances.rb'
 
 describe 'test_all_instances' do
 

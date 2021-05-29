@@ -1,5 +1,5 @@
-require_relative 'spec_models/validates/Grade_Validates.rb'
-require_relative 'spec_models/validates/Student_Validates.rb'
+require_relative 'spec_models/validates/grade_validates.rb'
+require_relative 'spec_models/validates/student_validates.rb'
 
 describe 'test_validates' do
   let(:student) do
@@ -41,6 +41,7 @@ describe 'test_validates' do
     student2 = Student_Validates.new
     student2.full_name = ""
     student2.age = 19
+
     expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo full_name no contiene valor en los limites esperados")
   end
 
@@ -48,6 +49,7 @@ describe 'test_validates' do
     student2 = Student_Validates.new
     student2.full_name = "Pepe"
     student2.age = 1
+
     expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo age no contiene valor en los limites esperados")
   end
 
@@ -69,6 +71,7 @@ describe 'test_validates' do
     student2.full_name = "Pepe"
     student2.age = 19
     student2.save!
+
     expect(student2.dni).to eq(11111)
   end
 end

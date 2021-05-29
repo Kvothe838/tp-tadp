@@ -1,7 +1,7 @@
-require_relative 'spec_models/forget/Person_Forget.rb'
-require_relative 'spec_models/forget/Grade_Forget.rb'
-require_relative 'spec_models/forget/Student_Forget.rb'
-require_relative 'spec_models/forget/Automovil_Forget.rb'
+require_relative 'spec_models/forget/person_forget.rb'
+require_relative 'spec_models/forget/grade_forget.rb'
+require_relative 'spec_models/forget/student_forget.rb'
+require_relative 'spec_models/forget/automovil_forget.rb'
 
 describe 'test_forget' do
   it 'crea una persona' do

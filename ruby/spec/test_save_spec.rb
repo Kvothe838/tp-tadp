@@ -1,7 +1,7 @@
-require_relative 'spec_models/save/Person_Save.rb'
-require_relative 'spec_models/save/Grade_Save.rb'
-require_relative 'spec_models/save/Student_Save.rb'
-require_relative 'spec_models/save/Automovil_Save.rb'
+require_relative 'spec_models/save/person_save.rb'
+require_relative 'spec_models/save/grade_save.rb'
+require_relative 'spec_models/save/student_save.rb'
+require_relative 'spec_models/save/automovil_save.rb'
 
 describe 'test_save' do
   let(:persona) do
@@ -22,6 +22,7 @@ describe 'test_save' do
 
   it 'crea una persona' do
     persona.save!
+
     expect(persona.id).not_to be_nil
   end
 

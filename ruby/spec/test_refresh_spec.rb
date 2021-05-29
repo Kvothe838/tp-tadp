@@ -1,7 +1,7 @@
-require_relative 'spec_models/refresh/Person_Refresh.rb'
-require_relative 'spec_models/refresh/Grade_Refresh.rb'
-require_relative 'spec_models/refresh/Student_Refresh.rb'
-require_relative 'spec_models/refresh/Automovil_Refresh.rb'
+require_relative 'spec_models/refresh/person_refresh.rb'
+require_relative 'spec_models/refresh/grade_refresh.rb'
+require_relative 'spec_models/refresh/student_refresh.rb'
+require_relative 'spec_models/refresh/automovil_refresh.rb'
 
 describe 'test_refresh' do
 
