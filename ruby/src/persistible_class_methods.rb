@@ -67,17 +67,13 @@ module Persistible
       attr_accessor named.to_sym
       tabla_clase = attr_persistibles
 
-      #puts "Atr: #{atributos_ancestros}"
+
       atributos_ancestros.each do |atributo|
-        unless tabla_clase.repite_columna(atributo[:named])
+        unless tabla_clase.repite_columna?(atributo)
           tabla_clase.agregar_columna!(atributo)
         end
       end
-      #puts "Atributos: #{atributos_ancestros}"
-
-      unless tabla_clase.repite_columna(named)
-        tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
-      end
+      tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
     end
 
     def find_by_id_from_table(id)

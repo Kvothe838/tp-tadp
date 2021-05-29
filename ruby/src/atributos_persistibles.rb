@@ -8,12 +8,26 @@ class AtributosPersistibles
     @nombre = nombre
   end
 
-  def repite_columna(named)
+  def repite_nombre_columna(named)
     atributos.any? { |obj| obj[:named] == named }
   end
 
+  def repite_columna?(columna)
+    atributos.any? { |obj| obj == columna }
+  end
+
   def agregar_columna!(columna)
-    @atributos << columna
+    unless repite_nombre_columna(columna[:named])
+      atributos << columna
+    else
+      columna_repetida = atributos.find{ |obj| obj[:named] == columna[:named] }
+      unless columna_repetida.nil?
+        columna_repetida[:tipo] = columna[:tipo]
+        columna_repetida[:validates] = columna[:validates]
+        columna_repetida[:relation] = columna[:relation]
+        columna_repetida[:default] = columna[:default]
+      end
+    end
   end
 
   def es_valor_correcto_segun_clase(valor, clase)
