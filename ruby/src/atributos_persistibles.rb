@@ -35,9 +35,10 @@ class AtributosPersistibles
               inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
       else if (limit[:to])
              superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
-      else if (limit[:validate])
+           else if (limit[:validate])
+                  #puts "Objeto: #{objeto}"
              value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
-             validate_bloque =  value_atributo.ejecutar_proc(limit[:validate])
+             validate_bloque =  objeto.ejecutar_proc(limit[:validate])
         else
           puts "No contemplado"
           end
@@ -53,6 +54,7 @@ end
 
   def validar!(objeto)
     atributos.each do |atributo|
+      #puts "Atributo individual: #{atributo}"
       nombre_atributo = atributo[:named]
       valor_atributo_instancia = objeto.instance_variable_get "@#{nombre_atributo}"
       clase_correcta_atributo = atributo[:tipo]
@@ -66,12 +68,14 @@ end
           raise TipoIncorrectoException.new mensaje_exception
         end
       else
+        #puts "Valor has many: #{valor_atributo_instancia}"
         valor_atributo_instancia.each do |elemento_array|
           mensaje_exception = "El atributo #{nombre_atributo} contiene al menos un elemento que no es de clase #{clase_correcta_atributo}"
-          evaluar_forma_correcta(valor_atributo_instancia, clase_correcta_atributo, mensaje_exception)
+          evaluar_forma_correcta(elemento_array, clase_correcta_atributo, mensaje_exception)
 
           #Cascadeo si no es tipo primitivo.
           unless es_tipo_primitivo? clase_correcta_atributo || !elemento_array.respond_to?("validar!")
+            #puts "Pase aqui"
             elemento_array.send(:validar!)
           end
         end
