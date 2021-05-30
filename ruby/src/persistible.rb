@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative './atributos_persistibles'
+require_relative 'atributos_persistibles'
 require_relative './persistible_class_methods'
 require_relative './tipo_incorrecto_exception'
 require 'pry'
@@ -15,19 +15,20 @@ module Persistible
 
   def initialize
     attr_persistibles.dame_los_many.each do |attribute|
-      self.instance_variable_set("@#{attribute[:named]}", [])
+      self.instance_variable_set("@#{attribute.named}", [])
     end
 
     attr_persistibles.atributos.each do |attribute|
-      valor_atributo = instance_variable_get("@#{attribute[:named]}")
-      if !attribute[:default].nil? && valor_atributo.nil?
-        self.instance_variable_set("@#{attribute[:named]}", attribute[:default])
+      valor_atributo = instance_variable_get("@#{attribute.named}")
+      if !attribute.default.nil? && valor_atributo.nil?
+        self.instance_variable_set("@#{attribute.named}", attribute.default)
       end
     end
   end
 
   def save!
     return if attr_persistibles.nil?
+    # puts "Save! de #{self.class}"
     validar!
 
     unless @id.nil?
@@ -38,16 +39,16 @@ module Persistible
 
     attr_persistibles_has_many = attr_persistibles.dame_los_many
     attr_persistibles_has_many.each do |attribute|
-      table_name = "#{self.class.to_s}-#{attribute[:named].to_s}"
-      values = instance_variable_get("@#{attribute[:named]}")
+      table_name = "#{self.class.to_s}-#{attribute.named}"
+      values = instance_variable_get("@#{attribute.named}")
 
       next if values.nil?
 
       hash_many = Hash[:id, @id]
       una_tabla = TADB::DB.table(table_name)
 
-      #puts "Inicio: #{attribute[:tipo]} #{attribute[:named]}"
-      if attr_persistibles.es_tipo_primitivo? attribute[:tipo] #Es primitivo
+      puts "Inicio: #{attribute.type} #{attribute.named}"
+      if attr_persistibles.es_tipo_primitivo? attribute.type #Es primitivo
         values.each do |value|
           otro_hash = hash_many.merge(Hash[:value, value])
           una_tabla.insert(otro_hash)
@@ -55,8 +56,7 @@ module Persistible
       else
         values.each do |value|
           value.save!
-          #puts value.id
-          #puts value.id.class
+          puts "#{attribute.type},#{attribute.named} id: #{value.id} "
           otro_hash = hash_many.merge(Hash[:value, value.id])
           una_tabla.insert(otro_hash)
         end
