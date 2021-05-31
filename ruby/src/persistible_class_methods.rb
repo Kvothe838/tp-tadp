@@ -66,7 +66,8 @@ module Persistible
       end
       relation.type = tipo
       relation.named = named
-      relation.crear_validaciones(no_blank, from, to, validate)
+      puts "[#{tipo},#{named}] no_blank:#{no_blank}, from:#{from}, to:#{to}, validate:#{validate}"
+      relation.crear_validaciones(from, to, no_blank, validate)
       relation.default = default
       tabla_clase.agregar_columna!(relation)
     end

@@ -39,10 +39,11 @@ class AtributosPersistibles
 
       # unless atributo.validar_tipo(objeto)
       # unless validacion_contenido(atributo,objeto)
-      unless atributo.validar!(objeto)
-        mensaje_exception = "El atributo #{atributo.named} no contiene valor en los limites esperados"
-        raise TipoIncorrectoException.new mensaje_exception
-      end
+      atributo.validar!(objeto)
+      # unless atributo.validar!(objeto)
+      #   mensaje_exception = "El atributo #{atributo.named} no contiene valor en los limites esperados"
+      #   raise TipoIncorrectoException.new mensaje_exception
+      # end
     end
     nil
   end

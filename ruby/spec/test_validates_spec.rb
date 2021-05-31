@@ -41,7 +41,6 @@ describe 'test_validates' do
     student2 = Student_Validates.new
     student2.full_name = ""
     student2.age = 19
-
     expect { student2.save! }.to raise_error(TipoIncorrectoException, "El atributo full_name no contiene valor en los limites esperados")
   end
 
