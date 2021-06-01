@@ -84,7 +84,6 @@ class AtributosPersistibles
       if es_tipo_primitivo? class_atributo
         objeto.instance_variable_set("@#{key}", value)
       else
-        # A mejorar esta parte e identitificar porque en los tests es nulo
         valor_aux = Kernel.const_get(class_atributo.to_s.to_sym).new
         valor_aux.id = value
         valor_aux.refresh!
@@ -119,45 +118,3 @@ class AtributosPersistibles
     end
   end
 end
-
-
-# def validacion_contenido(atributo,objeto ) #atributo
-#   inferior = true
-#   superior = true
-#   tiene_Contenido = true
-#   validate_bloque = true
-#   nombre_atributo = atributo[:named]
-#   validates = atributo[:validates]
-#   validates.each do |limit|
-#
-#     if (limit[:no_blank] && atributo[:relation] == "has_one")
-#       tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
-#     else if (limit[:from] && atributo[:relation] == "has_one")
-#      inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
-#     else if (limit[:to] && atributo[:relation] == "has_one")
-#           superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
-#         else if (limit[:validate])
-#                #puts "Objeto: #{objeto}"
-#                if(atributo[:relation] == "has_one")
-#                  validate_bloque =  objeto.ejecutar_proc(limit[:validate])
-#                else
-#                  value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
-#                  value_atributo.each do |elemento_array|
-#                    validate_bloque =  elemento_array.ejecutar_proc(limit[:validate])
-#                    if(!validate_bloque)
-#                      break
-#                    end
-#                  end
-#                end
-#              else
-#                puts "No contemplado"
-#              end
-#         end
-#     end
-#     end
-#   end
-#   devuelve = superior && inferior && tiene_Contenido && validate_bloque
-#   #tiene_Contenido = superior && inferior
-#   #tiene_Contenido
-#   devuelve
-# end

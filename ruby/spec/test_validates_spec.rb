@@ -23,8 +23,9 @@ describe 'test_validates' do
     grade = Grade_Validates.new
     grade.value = 'Test'
     student.grade = grade
+    mensaje_esperado = 'El atributo value no contiene valor de clase Numeric'
 
-    expect { student.save! }.to raise_error(ValidacionIncorrectaException, 'El atributo value no contiene valor de clase Numeric')
+    expect { student.save! }.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
   end
 
   it 'fallo en full_name' do
@@ -34,23 +35,27 @@ describe 'test_validates' do
     grade = Grade_Validates.new
     grade.value = 5
     student2.grades = [grade]
+    mensaje_esperado = 'El atributo full_name no contiene valor de clase String'
 
-    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, 'El atributo full_name no contiene valor de clase String')
+    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
   end
 
   it 'fallo con full_name en blanco' do
     student2 = Student_Validates.new
     student2.full_name = ''
     student2.age = 19
-    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, 'El atributo full_name es vacío')
+    mensaje_esperado = 'El atributo full_name es vacío'
+
+    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
   end
 
   it 'fallo con límites de age' do
     student2 = Student_Validates.new
     student2.full_name = 'Pepe'
     student2.age = 1
+    mensaje_esperado = 'El atributo age no contiene valor en los limites esperados'
 
-    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, 'El atributo age no contiene valor en los limites esperados')
+    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
   end
 
   it 'fallo con el proc validate' do
@@ -62,8 +67,9 @@ describe 'test_validates' do
     grade2 = Grade_Validates.new
     grade2.value = 1
     student2.grades = [grade, grade2]
+    mensaje_esperado = 'Validación no cumplida'
 
-    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, 'Validación no cumplida')
+    expect { student2.save! }.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
   end
 
   it 'valores por defecto' do
