@@ -1,15 +1,6 @@
 class AtributoPersistible
   attr_accessor :named, :type, :validations, :default
 
-  def validacion_contenido()
-    raise NotImplementedError
-  end
-
-  def dame_el_valor(objeto)
-    objeto.instance_variable_get("@#{named}")
-  end
-
-
   def crear_validaciones(from, to, no_blank, validate)
     validations = [type_validation]
     validations << from_validation(from) unless from.nil?
@@ -18,46 +9,50 @@ class AtributoPersistible
     validations << validate_validation(validate) unless validate.nil?
     self.validations = validations
   end
+
   def validar!(objeto)
-    # validations.all? { |v| objeto.instance_eval(&v) }
-    @var = variable_get(objeto)
-    puts "#{named}: #{@var} tipo: #{@var.class}"
-    validations.all? { |v| @var.instance_eval(&v) }
+    var = variable_get(objeto)
+    validar_elemento!(var)
+  end
+
+  def validar_elemento!(elemento)
+    validations.each { |v| elemento.instance_eval(&v) }
   end
 
   def validate_validation(validate)
-    validate
+    proc do
+      cumple_validacion = self.instance_eval(&validate)
+      raise ValidacionIncorrectaException, 'Validación no cumplida' unless cumple_validacion
+    end
   end
+
   def no_blank_validation
     named = self.named
-    mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-    puts "DEBERIA Tirar Exception" unless self.to_s.length == 0 || self.is_a?(NilClass)
-    # Proc.new { raise TipoIncorrectoException.new mensaje unless self.instance_variable_get("@#{named}").to_s != '' || self.instance_variable_get("@#{named}").is_a?(NilClass) }
-    Proc.new { raise TipoIncorrectoException.new "El atributo #{named} no contiene valor en los limites esperados" unless self.to_s.length == 0 }
+    mensaje = "El atributo #{named} es vacío"
+    proc do
+      raise ValidacionIncorrectaException, mensaje if to_s.length.zero? || is_a?(NilClass)
+    end
   end
 
   def from_validation(_from)
     named = self.named
     from = _from
     mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-    # Proc.new { puts "#{self.instance_variable_get("@#{named}")} > #{from}";raise TipoIncorrectoException.new mensaje unless (self.instance_variable_get("@#{named}") > from  || self.instance_variable_get("@#{named}").is_a?(NilClass))}
-    Proc.new { puts "#{self} > #{from}";raise TipoIncorrectoException.new mensaje unless (self > from  || self.is_a?(NilClass))}
+    proc { raise ValidacionIncorrectaException, mensaje unless self > from || is_a?(NilClass) }
   end
 
   def to_validation(_to)
     named = self.named
     to = _to
     mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-    # Proc.new { raise TipoIncorrectoException.new mensaje unless self.instance_variable_get("@#{named}") < to  || self.instance_variable_get("@#{named}").is_a?(NilClass)}
-    Proc.new { puts "#{self} > #{to}";raise TipoIncorrectoException.new mensaje unless (self < to  || self.is_a?(NilClass))}
+    proc { raise ValidacionIncorrectaException, mensaje unless self < to || is_a?(NilClass) }
   end
 
-  def type_validation
-    named = self.named
+  def type_validation_con_mensaje(mensaje)
     type = self.type
-    mensaje = "El atributo #{named} no contiene valor de clase #{type}"
-    # Proc.new { raise TipoIncorrectoException.new mensaje unless self.instance_variable_get("@#{named}").is_a?(type) || self.instance_variable_get("@#{named}").is_a?(NilClass) }
-    Proc.new { raise TipoIncorrectoException.new mensaje unless self.is_a?(type) || self.is_a?(NilClass) }
+    proc do
+      raise ValidacionIncorrectaException, mensaje unless is_a?(type) || is_a?(NilClass)
+    end
   end
 
   def variable_get(objeto)
@@ -71,40 +66,22 @@ end
 
 class HasManyPersistible < AtributoPersistible
   def validar!(objeto)
-    variable_get(objeto).each {|a| validar_elemento! a}
-  end
-  def validar_elemento!(elemento)
-    validations.all? {|v| elemento.instance_eval(&v)}
-  end
-  def no_blank_validation
-    named = self.named
-    mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-    Proc.new { raise TipoIncorrectoException.new mensaje unless self.to_s != '' || self.is_a?(NilClass) }
-  end
-
-  def from_validation(_from)
-    named = self.named
-    from = _from
-    mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-
-    Proc.new { puts "atributo #{named} > #{from}?";raise TipoIncorrectoException.new mensaje unless self > from || self.is_a?(NilClass)}
-  end
-
-  def to_validation(_to)
-    named = self.named
-    to = _to
-    mensaje = "El atributo #{named} no contiene valor en los limites esperados"
-    Proc.new { puts "atributo #{named} < #{to}?";raise TipoIncorrectoException.new mensaje unless self < to  || self.is_a?(NilClass)}
+    variable_get(objeto).each { |a| validar_elemento! a }
   end
 
   def type_validation
     named = self.named
     type = self.type
-    mensaje = "El atributo #{named} no contiene valor de clase #{type}"
-    Proc.new { puts "atributo #{named} tipo: #{type}";raise TipoIncorrectoException.new mensaje unless (self.is_a?(type) || self.is_a?(NilClass)) }
+    mensaje = "El atributo #{named} no contiene todos sus elementos de clase #{type}"
+    type_validation_con_mensaje mensaje
   end
 end
 
 class HasOnePersistible < AtributoPersistible
-
+  def type_validation
+    named = self.named
+    type = self.type
+    mensaje = "El atributo #{named} no contiene valor de clase #{type}"
+    type_validation_con_mensaje mensaje
+  end
 end

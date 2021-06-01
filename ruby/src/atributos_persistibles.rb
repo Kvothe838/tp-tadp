@@ -36,14 +36,7 @@ class AtributosPersistibles
 
   def validar!(objeto)
     atributos.each do |atributo|
-
-      # unless atributo.validar_tipo(objeto)
-      # unless validacion_contenido(atributo,objeto)
       atributo.validar!(objeto)
-      # unless atributo.validar!(objeto)
-      #   mensaje_exception = "El atributo #{atributo.named} no contiene valor en los limites esperados"
-      #   raise TipoIncorrectoException.new mensaje_exception
-      # end
     end
     nil
   end
@@ -57,9 +50,6 @@ class AtributosPersistibles
   end
 
   def dame_el_hash(objeto)
-    # puts "clase dame hash #{objeto.class}"
-    # puts dame_los_one.map { |a| a.named }
-
     dame_los_one.inject({}) do
     |nuevo_hash,atributo|
       tipo_atributo = atributo.type
@@ -84,12 +74,6 @@ class AtributosPersistibles
   end
 
   def refresh!(objeto, una_fila)
-    # obtengo la fila con el id
-    # una_fila = objeto.class.find_by_id_from_table(objeto.id)
-    # por cada par key => value en la fila, con instance_variable_set le asigno el value al symbol
-    # (casteado desde string) que es @algo ej @first_name
-    # puts una_fila
-    # puts atributos
     una_fila.each do |key, value|
       class_atributo = String
       if key != :id
@@ -109,8 +93,6 @@ class AtributosPersistibles
     end
 
     atributos_has_many = dame_los_many
-    # puts atributos_has_many
-
     atributos_has_many.each do |attribute|
 
       table_name = "#{objeto.class.to_s}-#{attribute.named.to_s}"
@@ -134,49 +116,48 @@ class AtributosPersistibles
       end
 
       objeto.instance_variable_set("@#{attribute.named}", arreglo)
-      # puts tabla_atributo_has_many.entries
     end
   end
 end
 
 
-def validacion_contenido(atributo,objeto ) #atributo
-  inferior = true
-  superior = true
-  tiene_Contenido = true
-  validate_bloque = true
-  nombre_atributo = atributo[:named]
-  validates = atributo[:validates]
-  validates.each do |limit|
-
-    if (limit[:no_blank] && atributo[:relation] == "has_one")
-      tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
-    else if (limit[:from] && atributo[:relation] == "has_one")
-           inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
-         else if (limit[:to] && atributo[:relation] == "has_one")
-                superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
-              else if (limit[:validate])
-                     #puts "Objeto: #{objeto}"
-                     if(atributo[:relation] == "has_one")
-                       validate_bloque =  objeto.ejecutar_proc(limit[:validate])
-                     else
-                       value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
-                       value_atributo.each do |elemento_array|
-                         validate_bloque =  elemento_array.ejecutar_proc(limit[:validate])
-                         if(!validate_bloque)
-                           break
-                         end
-                       end
-                     end
-                   else
-                     puts "No contemplado"
-                   end
-              end
-         end
-    end
-  end
-  devuelve = superior && inferior && tiene_Contenido && validate_bloque
-  #tiene_Contenido = superior && inferior
-  #tiene_Contenido
-  devuelve
-end
+# def validacion_contenido(atributo,objeto ) #atributo
+#   inferior = true
+#   superior = true
+#   tiene_Contenido = true
+#   validate_bloque = true
+#   nombre_atributo = atributo[:named]
+#   validates = atributo[:validates]
+#   validates.each do |limit|
+#
+#     if (limit[:no_blank] && atributo[:relation] == "has_one")
+#       tiene_Contenido = ((objeto.instance_variable_get "@#{nombre_atributo}").to_s !=  '' )
+#     else if (limit[:from] && atributo[:relation] == "has_one")
+#      inferior = (objeto.instance_variable_get "@#{nombre_atributo}") > limit[:from]
+#     else if (limit[:to] && atributo[:relation] == "has_one")
+#           superior = (objeto.instance_variable_get "@#{nombre_atributo}") < limit[:to]
+#         else if (limit[:validate])
+#                #puts "Objeto: #{objeto}"
+#                if(atributo[:relation] == "has_one")
+#                  validate_bloque =  objeto.ejecutar_proc(limit[:validate])
+#                else
+#                  value_atributo = objeto.instance_variable_get "@#{nombre_atributo}"
+#                  value_atributo.each do |elemento_array|
+#                    validate_bloque =  elemento_array.ejecutar_proc(limit[:validate])
+#                    if(!validate_bloque)
+#                      break
+#                    end
+#                  end
+#                end
+#              else
+#                puts "No contemplado"
+#              end
+#         end
+#     end
+#     end
+#   end
+#   devuelve = superior && inferior && tiene_Contenido && validate_bloque
+#   #tiene_Contenido = superior && inferior
+#   #tiene_Contenido
+#   devuelve
+# end

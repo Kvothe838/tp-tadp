@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative 'atributos_persistibles'
 require_relative './persistible_class_methods'
-require_relative './tipo_incorrecto_exception'
+require_relative './validacion_incorrecta_exception'
 require 'pry'
 
 # Mixin necesario para la clase que desee implementar un ORM.
@@ -28,12 +28,10 @@ module Persistible
 
   def save!
     return if attr_persistibles.nil?
-    # puts "Save! de #{self.class}"
+
     validar!
 
-    unless @id.nil?
-      table.delete(@id)
-    end
+    table.delete(@id) unless @id.nil?
 
     @id = table.insert(attr_persistibles.dame_el_hash(self))
 
@@ -47,7 +45,6 @@ module Persistible
       hash_many = Hash[:id, @id]
       una_tabla = TADB::DB.table(table_name)
 
-      puts "Inicio: #{attribute.type} #{attribute.named}"
       if attr_persistibles.es_tipo_primitivo? attribute.type #Es primitivo
         values.each do |value|
           otro_hash = hash_many.merge(Hash[:value, value])
@@ -56,7 +53,6 @@ module Persistible
       else
         values.each do |value|
           value.save!
-          puts "#{attribute.type},#{attribute.named} id: #{value.id} "
           otro_hash = hash_many.merge(Hash[:value, value.id])
           una_tabla.insert(otro_hash)
         end
@@ -66,7 +62,7 @@ module Persistible
 
   def refresh!
     if @id.nil?
-      puts "Este objeto no tiene id"
+      puts 'Este objeto no tiene id'
       return
     end
     una_fila = self.class.find_by_id_from_table(@id)

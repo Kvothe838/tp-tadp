@@ -43,12 +43,7 @@ module Persistible
     end
 
     def has_field(tipo, named, no_blank, from, to, validate, relation, default)
-      validates = get_validates(no_blank, from, to, validate)
-
-
-      #puts "Ancestors: #{self.ancestors}"
       ancestors_persistibles = self.ancestors.filter {|a| a.include?(Persistible) }
-      #puts "Inicio #{ancestors_persistibles}"
 
       atributos_ancestros = []
       ancestors_persistibles.each do |ancestor|
@@ -66,7 +61,7 @@ module Persistible
       end
       relation.type = tipo
       relation.named = named
-      puts "[#{tipo},#{named}] no_blank:#{no_blank}, from:#{from}, to:#{to}, validate:#{validate}"
+      # puts "[#{tipo},#{named}] no_blank:#{no_blank}, from:#{from}, to:#{to}, validate:#{validate}"
       relation.crear_validaciones(from, to, no_blank, validate)
       relation.default = default
       tabla_clase.agregar_columna!(relation)
