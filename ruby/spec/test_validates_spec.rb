@@ -75,16 +75,16 @@ describe 'test_validates' do
     expect(student2.dni).to eq(11111)
   end
 
-  # it 'falla por tener un array de dos tipos distintos en grades' do
-  #   student2 = Student_Validates.new
-  #   student2.full_name = 'Pepe'
-  #   student2.age = 19
-  #   grade = Grade_Validates.new
-  #   grade.value = 5
-  #   grade2 = Nothing_Validates.new
-  #   student2.grades = [grade, grade2]
-  #   mensaje_esperado = 'El atributo grades no contiene todos sus elementos de clase Grade_Validates'
-  #
-  #   expect(student2.save!).to raise_error(ValidacionIncorrectaException, mensaje_esperado)
-  # end
+  it 'falla por tener un array de dos tipos distintos en grades' do
+    student2 = Student_Validates.new
+    student2.full_name = 'Pepe'
+    student2.age = 19
+    grade = Grade_Validates.new
+    grade.value = 5
+    grade2 = Nothing_Validates.new
+    student2.grades = [grade, grade2]
+    mensaje_esperado = 'El atributo grades no contiene todos sus elementos de clase Grade_Validates'
+
+    expect{student2.save!}.to raise_error(ValidacionIncorrectaException, mensaje_esperado)
+  end
 end
