@@ -35,20 +35,15 @@ module Persistible
     end
 
     def has_many(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil, default: nil)
-      has_field(tipo, named, no_blank, from, to, validate, "has_many", default)
+      has_field(tipo, named, no_blank, from, to, validate, HasManyPersistible.new, default)
     end
 
     def has_one(tipo, named: raise('named requerido'), no_blank: nil, from: nil, to: nil, validate: nil, default: nil)
-      has_field(tipo, named, no_blank, from, to, validate, "has_one", default)
+      has_field(tipo, named, no_blank, from, to, validate, HasOnePersistible.new, default)
     end
 
     def has_field(tipo, named, no_blank, from, to, validate, relation, default)
-      validates = get_validates(no_blank, from, to, validate)
-
-
-      #puts "Ancestors: #{self.ancestors}"
       ancestors_persistibles = self.ancestors.filter {|a| a.include?(Persistible) }
-      #puts "Inicio #{ancestors_persistibles}"
 
       atributos_ancestros = []
       ancestors_persistibles.each do |ancestor|
@@ -64,7 +59,11 @@ module Persistible
           tabla_clase.agregar_columna!(atributo)
         end
       end
-      tabla_clase.agregar_columna!(Hash[:tipo, tipo].merge(Hash[:named, named]).merge(Hash[:validates, validates].merge(Hash[:relation, relation]).merge(Hash[:default, default])))
+      relation.type = tipo
+      relation.named = named
+      relation.crear_validaciones(from, to, no_blank, validate)
+      relation.default = default
+      tabla_clase.agregar_columna!(relation)
     end
 
     def find_by_id_from_table(id)

@@ -7,5 +7,5 @@ class Student_Validates
   has_one Numeric, named: :dni, default: 11111
   has_one Numeric, named: :age, from: 18, to: 100
   has_one Grade_Validates, named: :grade
-  has_many Grade_Validates, named: :grades, validate: proc{ value > 2 }
+  has_many Grade_Validates, named: :grades, validate: proc { value > 2 }
 end

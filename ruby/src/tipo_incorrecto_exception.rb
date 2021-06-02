@@ -1,1 +1,0 @@
-class TipoIncorrectoException < StandardError; end
