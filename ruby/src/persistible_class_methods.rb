@@ -19,18 +19,10 @@ module Persistible
 
     def get_validates(no_blank, from, to, validate)
       validates = []
-      unless no_blank.nil?
-        validates << Hash[:no_blank, no_blank]
-      end
-      unless from.nil?
-        validates << Hash[:from, from]
-      end
-      unless to.nil?
-        validates << Hash[:to, to]
-      end
-      unless validate.nil?
-        validates << Hash[:validate, validate]
-      end
+      validates << Hash[:no_blank, no_blank] unless no_blank.nil?
+      validates << Hash[:from, from] unless from.nil?
+      validates << Hash[:to, to] unless to.nil?
+      validates << Hash[:validate, validate] unless validate.nil?
       validates
     end
 
@@ -55,10 +47,10 @@ module Persistible
 
 
       atributos_ancestros.each do |atributo|
-        unless tabla_clase.repite_columna?(atributo)
-          tabla_clase.agregar_columna!(atributo)
-        end
+        next if tabla_clase.repite_columna?(atributo)
+        tabla_clase.agregar_columna!(atributo)
       end
+
       relation.type = tipo
       relation.named = named
       relation.crear_validaciones(from, to, no_blank, validate)
