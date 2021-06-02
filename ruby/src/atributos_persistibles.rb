@@ -1,5 +1,6 @@
 require_relative './boolean'
 require_relative './atributo_persistible'
+
 class AtributosPersistibles
   attr_accessor :atributos, :nombre
 
@@ -41,11 +42,11 @@ class AtributosPersistibles
     nil
   end
 
-  def dame_los_many()
+  def dame_los_many
     atributos.filter{ |a| a.is_a? HasManyPersistible }
   end
 
-  def dame_los_one()
+  def dame_los_one
     atributos.filter{ |a| a.is_a? HasOnePersistible }
   end
 
@@ -78,22 +79,20 @@ class AtributosPersistibles
       class_atributo = String
       if key != :id
         atributo = atributos.find { |a| a.named == key }
-        class_atributo = atributo.type
+        class_atributo = atributo&.type
       end
 
       if es_tipo_primitivo? class_atributo
         objeto.instance_variable_set("@#{key}", value)
       else
-        valor_aux = Kernel.const_get(class_atributo.to_s.to_sym).new
+        valor_aux = instanciar_por_tipo(class_atributo)
         valor_aux.id = value
         valor_aux.refresh!
         objeto.instance_variable_set("@#{key}", valor_aux)
       end
     end
 
-    atributos_has_many = dame_los_many
-    atributos_has_many.each do |attribute|
-
+    dame_los_many.each do |attribute|
       table_name = "#{objeto.class.to_s}-#{attribute.named.to_s}"
       tabla_atributo_has_many = TADB::DB.table(table_name)
       arreglo = []
@@ -105,9 +104,8 @@ class AtributosPersistibles
         end
       else
         tabla_atributo_has_many.entries.each do |fila|
-
           # arreglo.push(fila[:value])
-          valor_aux = Kernel.const_get(tipo.to_s.to_sym).new
+          valor_aux = instanciar_por_tipo(tipo)
           valor_aux.id = fila[:value]
           valor_aux.refresh!
           arreglo.push(valor_aux)
@@ -117,4 +115,11 @@ class AtributosPersistibles
       objeto.instance_variable_set("@#{attribute.named}", arreglo)
     end
   end
+
+  private
+
+  def instanciar_por_tipo(tipo)
+    Kernel.const_get(tipo.to_s.to_sym).new
+  end
+
 end
