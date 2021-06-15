@@ -5,8 +5,9 @@ class CoinFlip {
     if(a.t.gana(scala.util.Random.nextInt(2))){
       a.jugador.ganar(a.monto*1/a.t.probabilidad())
       true
+    }else{
+      false
     }
-    false
   }
 }
 
