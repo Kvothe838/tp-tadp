@@ -9,8 +9,11 @@ class ApuestasSpec extends AnyFreeSpec{
       val flip = new CoinFlip
 
       val resultado = flip.jugar(apuesta)
-      assert((bob_esponja.dinero == 150 && resultado) || (bob_esponja.dinero == 150 && !resultado))
+      assert((bob_esponja.dinero == 150 && resultado) || (bob_esponja.dinero == 50 && !resultado))
 
+      val otra_apuesta = new Apuesta(bob_esponja,new ApuestoCruz,50)
+      val otro_resultado = flip.jugar(otra_apuesta)
+      assert((bob_esponja.dinero == 200 && otro_resultado) || (bob_esponja.dinero == 0 && !otro_resultado))
     }
   }
 }
