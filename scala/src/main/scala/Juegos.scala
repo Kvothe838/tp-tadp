@@ -2,12 +2,8 @@ import scala.collection.mutable.ListBuffer
 
 class CoinFlip {
   def jugar(a:Apuesta): Unit ={
-    if(scala.util.Random.nextInt(1) == 1){
-      if(a.t.isInstanceOf[CaraOCrus]){
-        if(a.t.asInstanceOf[CaraOCrus].cruz){
-          a.jugador.ganar(a.monto*2)
-        }
-      }
+    if(a.t.gana(scala.util.Random.nextInt(2))){
+      a.jugador.ganar(a.monto*1/a.t.probabilidad())
     }
   }
 }
@@ -18,7 +14,7 @@ class Roulette {
     apuestas.addAll(nuevas_apuestas)
   }
   def spin(): Unit ={
-    var r = scala.util.Random.nextInt(37)
-
+    val r = scala.util.Random.nextInt(37)
+    apuestas.foreach(a => if(a.t.gana(r)){a.jugador.ganar(a.monto*1/a.t.probabilidad())})
   }
 }
