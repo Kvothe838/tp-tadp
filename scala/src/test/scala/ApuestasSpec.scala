@@ -5,9 +5,12 @@ class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta y tiene menos dinero disponible" in {
       val bob_esponja = new Jugador(100)
-      val apuesta = new Apuesta(bob_esponja,new CaraOCrus(false),50)
+      val apuesta = new Apuesta(bob_esponja,new ApuestoCara,50)
+      val flip = new CoinFlip
 
-      assert(bob_esponja.dinero == 50)
+      val resultado = flip.jugar(apuesta)
+      assert((bob_esponja.dinero == 150 && resultado) || (bob_esponja.dinero == 150 && !resultado))
+
     }
   }
 }

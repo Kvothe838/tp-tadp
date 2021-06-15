@@ -1,10 +1,12 @@
 import scala.collection.mutable.ListBuffer
 
 class CoinFlip {
-  def jugar(a:Apuesta): Unit ={
+  def jugar(a:Apuesta): Boolean ={
     if(a.t.gana(scala.util.Random.nextInt(2))){
       a.jugador.ganar(a.monto*1/a.t.probabilidad())
+      true
     }
+    false
   }
 }
 
