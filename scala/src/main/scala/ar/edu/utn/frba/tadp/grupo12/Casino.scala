@@ -18,16 +18,16 @@ object Casino {
   //devuelve la probabilidad de cada tipo de apuesta
   val probabilidad: (Apuesta => Double) = apuesta =>{
     apuesta.tipo match{
-      case Cara => 1/2
-      case Cruz => 1/2
-      case Rojo  => 18/37 //porque el 0 no es par/impar ni negro/rojo
-      case Negro  => 18/37 //porque el 0 no es par/impar ni negro/rojo
-      case Par  => 18/37 //porque el 0 no es par/impar ni negro/rojo
-      case Impar => 18/37 //porque el 0 no es par/impar ni negro/rojo
-      case PrimerDocena => 12/37
-      case SegundaDocena => 12/37
-      case TercerDocena => 12/37
-      case Numero(_) => 1/37
+      case Cara => 1.0/2.0
+      case Cruz => 1.0/2.0
+      case Rojo  => 18.0/37.0 //porque el 0 no es par/impar ni negro/rojo
+      case Negro  => 18.0/37.0 //porque el 0 no es par/impar ni negro/rojo
+      case Par  => 18.0/37.0 //porque el 0 no es par/impar ni negro/rojo
+      case Impar => 18.0/37.0 //porque el 0 no es par/impar ni negro/rojo
+      case PrimerDocena => 12.0/37.0
+      case SegundaDocena => 12.0/37.0
+      case TercerDocena => 12.0/37.0
+      case Numero(_) => 1.0/37.0
     }
   }
 
@@ -39,10 +39,10 @@ object Casino {
   // Auxiliar para metodo evaluar, ayuda a obtener el resultado de la apuesta
   def sale(tipoApuesta: TipoApuesta): Boolean = {
     tipoApuesta match {
-      case Cara => (dame_un_random(1) == 0)
-      case Cruz => (dame_un_random(1) == 1)
+      case Cara =>  (dame_un_random(1) == 0)
+      case Cruz =>  (dame_un_random(1) == 1)
       case Rojo => List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36).contains(dame_un_random(37))
-      case Negro => !List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36).contains(dame_un_random(37))
+      case Negro => List[Int](2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35).contains(dame_un_random(37))
       case PrimerDocena => List.range(1,13).contains(dame_un_random(37))
       case SegundaDocena => List.range(13,25).contains(dame_un_random(37))
       case TercerDocena => List.range(25,37).contains(dame_un_random(37))
