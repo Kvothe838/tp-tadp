@@ -43,6 +43,8 @@ object Casino {
       case Cruz =>  (dame_un_random(1) == 1)
       case Rojo => List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36).contains(dame_un_random(37))
       case Negro => List[Int](2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35).contains(dame_un_random(37))
+      case Par  => (dame_un_random(37) % 2 == 0)
+      case Impar => (dame_un_random(37) % 2 == 1)
       case PrimerDocena => List.range(1,13).contains(dame_un_random(37))
       case SegundaDocena => List.range(13,25).contains(dame_un_random(37))
       case TercerDocena => List.range(25,37).contains(dame_un_random(37))
@@ -51,27 +53,15 @@ object Casino {
   }
   // Dada una apuesta y un jugador evalua si este gana la apuesta y paga el monto.
   def evaluar(apuesta:Apuesta, jugador:Jugador): Jugador={
-    println(s"AdasdasdaD:${jugador.monto}")
-    apuesta.tipo match{
-      case Cara => if (sale(apuesta.tipo)) {
-        jugador.gana(apuesta.monto * 1 / probabilidad(apuesta))
-        println(s"la probabilidad de ${apuesta.tipo} es ${probabilidad(apuesta)}")
-      }
-      case Cruz => if (sale(apuesta.tipo)) jugador.gana(apuesta.monto * 1/probabilidad(apuesta))
-      case Rojo => if (sale(apuesta.tipo)) jugador.gana(apuesta.monto * 1/probabilidad(apuesta))
-      case PrimerDocena => if ((sale(apuesta.tipo))) jugador.gana(apuesta.monto*1/probabilidad(apuesta))
-      case SegundaDocena => if ((sale(apuesta.tipo))) jugador.gana(apuesta.monto*1/probabilidad(apuesta))
-      case TercerDocena => if ((sale(apuesta.tipo))) jugador.gana(apuesta.monto*1/probabilidad(apuesta))
-      case Negro => if ((sale(apuesta.tipo))) jugador.gana(apuesta.monto*1/probabilidad(apuesta))
-      case Numero(n) => if(sale(apuesta.tipo)) jugador.gana(apuesta.monto*1/probabilidad(apuesta))
-    }
-    println(s"adasdasdad:${jugador.monto}")
+    println(s"[${jugador.nombre}]: Antes de apostar:${jugador.monto}")
+    if (sale(apuesta.tipo)) jugador.gana(apuesta.monto * 1 / probabilidad(apuesta))
+    println(s"[${jugador.nombre}]: Despues de apostar:${jugador.monto}")
     jugador
   }
 
   def jugar(apuestas: Apuestas, jugador:Jugador) ={
     for(apuesta <- apuestas) {
-      println(s"dinero:${jugador.monto} cantidad apostando:${apuesta.monto}")
+      println(s"[${jugador.nombre}]: dinero:${jugador.monto} cantidad apostando:${apuesta.monto}")
       //Si puede y paga la apuesta entonces se evalua la apuesta para ver si gana, sino se sigue a la siguiente apuesta
       if (jugador.pagar(apuesta)) evaluar(apuesta, jugador)
     }

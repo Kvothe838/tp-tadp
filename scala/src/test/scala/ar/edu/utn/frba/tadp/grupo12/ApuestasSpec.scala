@@ -5,7 +5,7 @@ import org.scalatest.freespec.AnyFreeSpec
 class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta y tiene menos dinero disponible" in {
-      val bob_esponja = new Jugador(TipoCauto,100)
+      val bob_esponja = new Jugador("Bob Esponja",TipoCauto,100)
       val apuestas = List[Apuesta](new Apuesta(Cara,50))
       Casino.jugar(apuestas,bob_esponja)
       assert(bob_esponja.monto == 50||bob_esponja.monto == 150)

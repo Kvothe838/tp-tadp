@@ -1,14 +1,14 @@
 package ar.edu.utn.frba.tadp.grupo12
 
-case class Jugador(tipo:TipoJugador,var monto:Double){
+case class Jugador(val nombre:String,tipo:TipoJugador,var monto:Double){
   def gana(cantidad: Double): Unit ={
     monto += cantidad
-    println(s"gane:${cantidad}, ahora tengo ${monto}")
+    println(s"[${nombre}]: gane:${cantidad}, ahora tengo ${monto}")
   }
   def pagar(apuesta: Apuesta): Boolean ={
     if(monto >= apuesta.monto){
       monto -= apuesta.monto
-      println(s"me quedan ${monto}")
+      println(s"[${nombre}]: me quedan ${monto}")
       true
     }else{
       false
