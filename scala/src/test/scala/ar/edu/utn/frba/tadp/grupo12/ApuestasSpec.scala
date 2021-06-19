@@ -4,21 +4,13 @@ import org.scalatest.freespec.AnyFreeSpec
 
 class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
-    "Jugador apuesta y tiene menos dinero disponible" in {
+    "Jugador apuesta Cara y juega" in {
       val bob_esponja = new Jugador("Bob Esponja",TipoCauto,100)
       val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50))
       Casino.jugar(apuestas,bob_esponja)
       assert(bob_esponja.monto == 50||bob_esponja.monto == 150)
     }
 
-//    "Jugador apuesta coin" in {
-//      val flip = new CoinFlip
-//      val bob_esponja = new Jugador(TipoRacional,100)
-//      val apuesta = new Apuesta(bob_esponja, new Cara,50)
-//      val resultado = flip.jugar(apuesta)
-//
-//      assert((bob_esponja.dinero == (50+apuesta.monto*2) && resultado) || (bob_esponja.dinero == 50 && !resultado))
-//    }
 
 //    "Dos jugadores apuestan roulette" in {
 //      val roulette = new Roulette

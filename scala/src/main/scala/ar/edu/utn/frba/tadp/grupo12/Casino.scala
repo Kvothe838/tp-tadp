@@ -36,14 +36,16 @@ object Casino {
 
   //me da un random [0,hasta), sin incluir la posibilidad que de el valor hasta.
   def dame_un_random(hasta: Int): Int ={
-    scala.util.Random.nextInt(hasta)
+    val num = scala.util.Random.nextInt(hasta)
+    println(s"Salio: ${num}")
+    num
   }
 
   // Auxiliar para método evaluar, ayuda a obtener el resultado de la apuesta
   def sale(tipoApuesta: TipoApuesta): Boolean = {
     tipoApuesta match {
-      case Cara | CaraCargada =>  dame_un_random(1) == 0
-      case Cruz | CruzCargada =>  dame_un_random(1) == 1
+      case Cara | CaraCargada =>  dame_un_random(2) == 0
+      case Cruz | CruzCargada =>  dame_un_random(2) == 1
       case Rojo => List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36).contains(dame_un_random(37))
       case Negro => List[Int](2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35).contains(dame_un_random(37))
       case Par  => dame_un_random(37) % 2 == 0
@@ -57,7 +59,9 @@ object Casino {
   // Dada una apuesta y un jugador evalúa si este gana la apuesta y paga el monto.
   def evaluar(apuesta:Apuesta, jugador:Jugador): Jugador={
     println(s"[${jugador.nombre}]: Antes de apostar:${jugador.monto}")
-    if (sale(apuesta.tipo.tipoApuesta)) jugador.gana(apuesta.monto * 1 / probabilidad(apuesta))
+    if (sale(apuesta.tipo.tipoApuesta)) {
+      jugador.gana(apuesta.monto * 1 / probabilidad(apuesta))
+    }
     println(s"[${jugador.nombre}]: Después de apostar:${jugador.monto}")
     jugador
   }
