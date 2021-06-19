@@ -31,4 +31,4 @@ case object TipoArriesgado extends TipoJugador
 // elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
 case object TipoCauto extends TipoJugador
 //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
-case class TipoCriterio(criterio: (TipoApuesta => TipoApuesta)) extends TipoJugador
+case class TipoCriterio(criterio: (List[TipoApuesta] => List[TipoApuesta])) extends TipoJugador
