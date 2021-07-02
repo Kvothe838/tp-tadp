@@ -24,6 +24,18 @@ class ApuestasSpec extends AnyFreeSpec{
       println(comb.flatten)
       assert(comb.length == 4)
     }
+
+    "Juegos Sucesivos" in {
+      val bob_marley = Jugador("Bob Marley",TipoCauto,15)
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
+        new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
+      val chance_de_ganar_550 = Casino.prob_ganar(apuestas)
+      assert(chance_de_ganar_550 == 0.5*1/37)
+      val monto_final = Casino.jugar(apuestas,bob_marley).jugador.monto
+      println(s"monto final: ${monto_final}")
+      assert(monto_final == 5 || monto_final == 550 || monto_final == 10)
+    }
 //    "Dos jugadores apuestan roulette" in {
 //      val roulette = new Roulette
 //      val bob_esponja = new Jugador()

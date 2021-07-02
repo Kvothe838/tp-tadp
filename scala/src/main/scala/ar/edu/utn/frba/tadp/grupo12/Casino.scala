@@ -13,12 +13,14 @@ object Casino {
 //    println(s"apuestas.lenght ${apuestas.length}")
 //    apuestas.toSet[Apuesta].subsets.toList
 //  }
+  def f_max(apuestas:Apuestas, g:(List[Apuesta]=>Double)):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas.toList)).toList
+  def f(apuestas:Apuestas, g:(List[Apuestas]=>Apuestas)):Apuestas = g(combinar(apuestas).map(_.toList).toList)
   def combinar[T](seq: Seq[T]) : Iterable[Seq[T]] = {
     (1 to seq.length).view.flatMap(i => seq.combinations(i).flatMap(_.permutations)).toList
   }
-  val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)).reduce(_*_)
+  val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   //TODO ver como es esto de probabilidad de no perder
-  val prob_no_perder: Apuestas => Double = apuestas => prob_ganar(apuestas) + apuestas.map(apuesta => probabilidad(apuesta)).reduce(_+_)/apuestas.length
+  val prob_no_perder: Apuestas => Double = apuestas => prob_ganar(apuestas) + apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_+_)/apuestas.length
   val criterio_racional: Apuestas => Double = apuestas => prob_ganar(apuestas)*1/prob_ganar(apuestas)
   val criterio_arriesgado: Apuestas => Double = apuestas => 1/prob_ganar(apuestas)
   def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
@@ -27,34 +29,29 @@ object Casino {
       // O sea, si en uno hay 20% de duplicar, 15% de quedar igual y 70% de quedar en 0,
       // y en el otro hay 30% de triplicar, 50% de perder la mitad y 20% de quedar en 0,
       // elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
-      case TipoCauto => {
-        combinar(posibles_apuestas).maxBy(apuestas => prob_no_perder(apuestas.toList)).toList
-      }
+      case TipoCauto => f_max(posibles_apuestas, prob_no_perder)
       //Si es un jugador racional, va a ponerle un puntaje a la distribución final de las posibles
       // ganancias haciendo la suma de cada posible ganancia * su probabilidad de ocurrencia,
       // y va a elegir la lista de juegos que puntúe mejor según ese criterio.
-      case TipoRacional => {
-        combinar(posibles_apuestas).maxBy(apuestas => criterio_racional(apuestas.toList)).toList
-      }
+      case TipoRacional => f_max(posibles_apuestas, criterio_racional)
       //Un jugador arriesgado, en cambio, va a elegir la lista de juegos para la cual el suceso que
       // le deje mayor ganancia sea mejor, sin importar la probabilidad del mismo.
-      case TipoArriesgado => {
-        combinar(posibles_apuestas).maxBy(apuestas => criterio_arriesgado(apuestas.toList)).toList
-      }
+      case TipoArriesgado => f_max(posibles_apuestas, criterio_arriesgado)
+
       //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
-      case TipoCriterio(criterio) => combinar(posibles_apuestas).maxBy(apuestas => criterio(apuestas.toList)).toList
+      case TipoCriterio(criterio) => f(posibles_apuestas,criterio)
     }
   }
 
   //TODO ver como sperar esto en Distribucion Equiprobable y Distribucion a Partir de eventos Ponderados
-  val probabilidad: Apuesta => Double = apuesta =>{
+  val probabilidad: Apuesta => (Double,Double) = apuesta =>{
     apuesta.tipo.tipoApuesta match{
-      case Cara | Cruz => DistribucionEquiprobable.probabilidad(List(Cara,Cruz))
-      case CaraCargada => DistribucionPonderada.probabilidad(List(CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada), apuesta.tipo.tipoApuesta)
-      case CruzCargada => DistribucionPonderada.probabilidad(List(CruzCargada,Cara,CruzCargada,Cara,CruzCargada,Cara,CruzCargada), apuesta.tipo.tipoApuesta) // deberia ser una distribucion a partir de eventos ponderados ejem [Cruz,Cara,Cruz,Cara,Cruz,Cara,Cruz]
-      case Rojo | Negro | Par | Impar => 18.0/37.0 //porque el 0 no es par/impar ni negro/rojo
-      case PrimerDocena | SegundaDocena | TercerDocena => 12.0/37.0
-      case Numero(_) => 1.0/37.0
+      case Cara | Cruz => (DistribucionEquiprobable.probabilidad(List(Cara,Cruz)),2)
+      case CaraCargada => (DistribucionPonderada.probabilidad(List(CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada), apuesta.tipo.tipoApuesta),2)
+      case CruzCargada => (DistribucionPonderada.probabilidad(List(CruzCargada,Cara,CruzCargada,Cara,CruzCargada,Cara,CruzCargada), apuesta.tipo.tipoApuesta),2) // deberia ser una distribucion a partir de eventos ponderados ejem [Cruz,Cara,Cruz,Cara,Cruz,Cara,Cruz]
+      case Rojo | Negro | Par | Impar => (18.0/37.0,2) //porque el 0 no es par/impar ni negro/rojo
+      case PrimerDocena | SegundaDocena | TercerDocena => (12.0/37.0,3)
+      case Numero(_) => (1.0/37.0,36)
     }
   }
 
@@ -82,7 +79,7 @@ object Casino {
   // Dada una apuesta y un jugador evalúa si este gana la apuesta y paga el monto.
   def evaluar(apuesta:Apuesta, resultado: State): State={
     if (sale(apuesta.tipo.tipoApuesta)) {
-      resultado.gana(apuesta.monto * 1 / probabilidad(apuesta))
+      resultado.gana(apuesta.monto * probabilidad(apuesta)._2)
     } else{
       resultado
     }
