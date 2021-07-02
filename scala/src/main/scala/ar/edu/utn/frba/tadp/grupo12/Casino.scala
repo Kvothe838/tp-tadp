@@ -13,41 +13,31 @@ object Casino {
 //    println(s"apuestas.lenght ${apuestas.length}")
 //    apuestas.toSet[Apuesta].subsets.toList
 //  }
-  def f_max(apuestas:Apuestas, g:(List[Apuesta]=>Double)):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas.toList)).toList
-  def f(apuestas:Apuestas, g:(List[Apuestas]=>Apuestas)):Apuestas = g(combinar(apuestas).map(_.toList).toList)
-  def combinar[T](seq: Seq[T]) : Iterable[Seq[T]] = {
-    (1 to seq.length).view.flatMap(i => seq.combinations(i).flatMap(_.permutations)).toList
-  }
+  def f_max(apuestas:Apuestas, g:(List[Apuesta]=>Double)):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas))
   val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
-  //TODO ver como es esto de probabilidad de no perder
-//  val prob_no_perder: Apuestas => Double = apuestas => prob_ganar(apuestas) + apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_+_)/apuestas.length
-
-  def recuperan_los_montos(apuestas: Apuestas):Boolean = apuestas.map(a => a.monto*probabilidad(a)._2).sum >= apuestas.foldLeft(0.0){ (n, a)=> a.monto}
-  val dame_las_probabilidades: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).sum
-  val prob_no_perder: Apuestas => Double = apuestas => {
-    val probabilidades = for {
-      apuestas <- combinar(apuestas).map(a => a.toList).toList if recuperan_los_montos(apuestas)
-    } yield dame_las_probabilidades(apuestas)
-    probabilidades.sum
+  def f(apuestas:Apuestas, g:(List[Apuestas]=>Apuestas)):Apuestas = g(combinar(apuestas))
+  def combinar[T](seq: Seq[T]) : List[List[T]] = {
+    (1 to seq.length).flatMap(i => seq.combinations(i).flatMap(_.permutations)).distinct.map(_.toList).toList
+  }
+  def probabilidad_de_conjunto(apuestas: Apuestas):Double ={
+    apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   }
 
-
-  val criterio_racional: Apuestas => Double = apuestas => prob_ganar(apuestas)*1/prob_ganar(apuestas)
-  val criterio_arriesgado: Apuestas => Double = apuestas => 1/prob_ganar(apuestas)
   def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
+    val combinadas = combinar(posibles_apuestas)
     jugador.tipo match {
       //Un jugador cauto elegiría la sucesión de juegos en la cuál la probabilidad de no perder plata sea mayor.
       // O sea, si en uno hay 20% de duplicar, 15% de quedar igual y 70% de quedar en 0,
       // y en el otro hay 30% de triplicar, 50% de perder la mitad y 20% de quedar en 0,
       // elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
-      case TipoCauto => f_max(posibles_apuestas, prob_no_perder)
+      case TipoCauto => combinadas.maxBy(apuestas => probabilidad_de_conjunto(apuestas))
       //Si es un jugador racional, va a ponerle un puntaje a la distribución final de las posibles
       // ganancias haciendo la suma de cada posible ganancia * su probabilidad de ocurrencia,
       // y va a elegir la lista de juegos que puntúe mejor según ese criterio.
-      case TipoRacional => f_max(posibles_apuestas, criterio_racional)
+      case TipoRacional => combinadas.maxBy(apuestas => probabilidad_de_conjunto(apuestas))
       //Un jugador arriesgado, en cambio, va a elegir la lista de juegos para la cual el suceso que
       // le deje mayor ganancia sea mejor, sin importar la probabilidad del mismo.
-      case TipoArriesgado => f_max(posibles_apuestas, criterio_arriesgado)
+      case TipoArriesgado => combinadas.maxBy(apuestas => apuestas.map(a=>a.monto*probabilidad(a)._2))
 
       //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
       case TipoCriterio(criterio) => f(posibles_apuestas,criterio)
@@ -110,7 +100,7 @@ object Casino {
           case StandBy(jugador) => jugar(apuestas.tail,jugador)
         }
     }
-}
+  }
 
 
 }

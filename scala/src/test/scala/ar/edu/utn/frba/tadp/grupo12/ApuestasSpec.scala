@@ -6,7 +6,8 @@ class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta Cara y juega" in {
       val bob_esponja = new Jugador("Bob Esponja",TipoCauto,100)
-      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
       println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
       assert(resultado.jugador.monto == 50||resultado.jugador.monto == 150||resultado.jugador.monto == 300||resultado.jugador.monto == 0)
@@ -20,8 +21,8 @@ class ApuestasSpec extends AnyFreeSpec{
 
     "Combinacion" in {
       val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cruz,DistribucionEquiprobable),50))
-      val comb = Casino.combinar(apuestas).toList
-      println(comb.flatten)
+      val comb = Casino.combinar(apuestas)
+      println(comb.flatten.map(_.tipo.tipoApuesta))
       assert(comb.length == 4)
     }
 
@@ -35,6 +36,29 @@ class ApuestasSpec extends AnyFreeSpec{
       val monto_final = Casino.jugar(apuestas,bob_marley).jugador.monto
       println(s"monto final: ${monto_final}")
       assert(monto_final == 5 || monto_final == 550 || monto_final == 10)
+    }
+
+    "Jugador Cauto" in {
+      val cauto = Jugador("Juan Cauto",TipoCauto,15)
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // 0.5, las chances de no perder son 0.5
+        new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15), // 1/37
+        new Apuesta(Tipo(Par,DistribucionEquiprobable),15), // 18/37
+        new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 1/37
+
+
+      println(s" planificacion ${Casino.planificar(cauto,apuestas).map(_.tipo.tipoApuesta)} cantidad ${Casino.planificar(cauto,apuestas).length}")
+    }
+    "Jugador Arriesgado" in {
+      val arriesgado = Jugador("Juan Arriesgado",TipoArriesgado,15)
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
+        new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15), // 0 15
+        new Apuesta(Tipo(Par,DistribucionEquiprobable),15), // 0 15
+        new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 0 15
+
+
+      println(s" planificacion ${Casino.planificar(arriesgado,apuestas).map(_.tipo.tipoApuesta)} cantidad ${Casino.planificar(arriesgado,apuestas).length}")
     }
 //    "Dos jugadores apuestan roulette" in {
 //      val roulette = new Roulette
