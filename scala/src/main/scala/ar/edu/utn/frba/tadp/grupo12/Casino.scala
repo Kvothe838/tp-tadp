@@ -20,7 +20,18 @@ object Casino {
   }
   val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   //TODO ver como es esto de probabilidad de no perder
-  val prob_no_perder: Apuestas => Double = apuestas => prob_ganar(apuestas) + apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_+_)/apuestas.length
+//  val prob_no_perder: Apuestas => Double = apuestas => prob_ganar(apuestas) + apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_+_)/apuestas.length
+
+  def recuperan_los_montos(apuestas: Apuestas):Boolean = apuestas.map(a => a.monto*probabilidad(a)._2).sum >= apuestas.foldLeft(0.0){ (n, a)=> a.monto}
+  val dame_las_probabilidades: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).sum
+  val prob_no_perder: Apuestas => Double = apuestas => {
+    val probabilidades = for {
+      apuestas <- combinar(apuestas).map(a => a.toList).toList if recuperan_los_montos(apuestas)
+    } yield dame_las_probabilidades(apuestas)
+    probabilidades.sum
+  }
+
+
   val criterio_racional: Apuestas => Double = apuestas => prob_ganar(apuestas)*1/prob_ganar(apuestas)
   val criterio_arriesgado: Apuestas => Double = apuestas => 1/prob_ganar(apuestas)
   def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
