@@ -1,7 +1,8 @@
 package ar.edu.utn.frba.tadp.grupo12
 
+import scala.util.{Success, Try}
+
 object Casino {
-  type Abc = Jugador => Jugador
   type Apuestas = List[Apuesta]
 
   //No estoy seguro que que voy a hacer con esto, podría devolver Apuestas.
@@ -35,10 +36,8 @@ object Casino {
   }
 
   //me da un random [0,hasta), sin incluir la posibilidad que de el valor hasta.
-  def dame_un_random(hasta: Int): Int ={
-    val num = scala.util.Random.nextInt(hasta)
-    println(s"Salio: ${num}")
-    num
+  def dame_un_random(menor_a: Int): Int ={
+    scala.util.Random.nextInt(menor_a)
   }
 
   // Auxiliar para método evaluar, ayuda a obtener el resultado de la apuesta
@@ -56,21 +55,31 @@ object Casino {
       case Numero(numero) => numero == dame_un_random(37)
     }
   }
+
   // Dada una apuesta y un jugador evalúa si este gana la apuesta y paga el monto.
-  def evaluar(apuesta:Apuesta, jugador:Jugador): Jugador={
-    println(s"[${jugador.nombre}]: Antes de apostar:${jugador.monto}")
+  def evaluar(apuesta:Apuesta, resultado: State): State={
     if (sale(apuesta.tipo.tipoApuesta)) {
-      jugador.gana(apuesta.monto * 1 / probabilidad(apuesta))
+      resultado.gana(apuesta.monto * 1 / probabilidad(apuesta))
+    } else{
+      resultado
     }
-    println(s"[${jugador.nombre}]: Después de apostar:${jugador.monto}")
-    jugador
   }
 
-  def jugar(apuestas: Apuestas, jugador:Jugador) ={
-    for(apuesta <- apuestas) {
-      println(s"[${jugador.nombre}]: dinero:${jugador.monto} cantidad apostando:${apuesta.monto}")
-      //Si puede y paga la apuesta entonces se evalúa la apuesta para ver si gana, sino se sigue a la siguiente apuesta
-      if (jugador.pagar(apuesta)) evaluar(apuesta, jugador)
+  // states
+
+
+  def jugar(apuestas: Apuestas, jugador: Jugador): State ={
+    apuestas.foldLeft(State(jugador)){
+      (resultado_previo, apuesta) =>
+        resultado_previo match{
+          case Betting(jugador) => if(jugador.puedePagar(apuesta)) resultado_previo.hacerApuesta(apuesta) else {
+            println(s"[${jugador.nombre}] no puede pagar ${apuesta.monto} porque solo tiene ${jugador.monto}")
+            StandBy(jugador)
+          }
+          case StandBy(jugador) => jugar(apuestas.tail,jugador)
+        }
     }
-  }
+}
+
+
 }

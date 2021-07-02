@@ -6,9 +6,10 @@ class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta Cara y juega" in {
       val bob_esponja = new Jugador("Bob Esponja",TipoCauto,100)
-      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50))
-      Casino.jugar(apuestas,bob_esponja)
-      assert(bob_esponja.monto == 50||bob_esponja.monto == 150)
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
+      val resultado =Casino.jugar(apuestas,bob_esponja)
+      println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
+      assert(resultado.jugador.monto == 50||resultado.jugador.monto == 150||resultado.jugador.monto == 300||resultado.jugador.monto == 0)
     }
 
 
