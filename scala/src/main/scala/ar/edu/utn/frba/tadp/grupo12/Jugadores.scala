@@ -1,5 +1,7 @@
 package ar.edu.utn.frba.tadp.grupo12
 
+import ar.edu.utn.frba.tadp.grupo12.Casino.Apuestas
+
 case class Jugador(nombre:String,tipo:TipoJugador,monto:Double){
   def puedePagar(apuesta: Apuesta): Boolean = {
     monto >= apuesta.monto
@@ -27,4 +29,4 @@ case object TipoArriesgado extends TipoJugador
 // elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
 case object TipoCauto extends TipoJugador
 //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
-case class TipoCriterio(criterio: (List[TipoApuesta] => List[TipoApuesta])) extends TipoJugador
+case class TipoCriterio(criterio: Function[List[Apuesta],Apuesta]) extends TipoJugador

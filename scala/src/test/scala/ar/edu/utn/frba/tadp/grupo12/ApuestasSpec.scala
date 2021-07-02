@@ -12,7 +12,18 @@ class ApuestasSpec extends AnyFreeSpec{
       assert(resultado.jugador.monto == 50||resultado.jugador.monto == 150||resultado.jugador.monto == 300||resultado.jugador.monto == 0)
     }
 
+    "Probabilidad de ganar en una coleccion" in {
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cruz,DistribucionEquiprobable),50))
+      val proba = Casino.prob_ganar(apuestas)
+      assert(proba == 0.25)
+    }
 
+    "Combinacion" in {
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cruz,DistribucionEquiprobable),50))
+      val comb = Casino.combinar(apuestas).toList
+      println(comb.flatten)
+      assert(comb.length == 4)
+    }
 //    "Dos jugadores apuestan roulette" in {
 //      val roulette = new Roulette
 //      val bob_esponja = new Jugador()

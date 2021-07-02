@@ -1,6 +1,9 @@
 package ar.edu.utn.frba.tadp.grupo12
 
 class Apuesta(val tipo: Tipo, val monto: Double)
+object Apuesta {
+  implicit def ordering[A <: Apuesta]: Ordering[A] = Ordering.by(_.toString)
+}
 trait TipoApuesta
 case object Cara extends TipoApuesta
 case object Cruz extends TipoApuesta
