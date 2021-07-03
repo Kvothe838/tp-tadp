@@ -1,10 +1,11 @@
 package ar.edu.utn.frba.tadp.grupo12
 
+import scala.::
 import scala.annotation.tailrec
 
 trait ArbolApuestas[+A]{
   def contar_hojas: Int ={
-    @tailrec
+    @tailrec //optimizacion para el loop
     def loop(a: List[ArbolApuestas[A]], z: Int): Int = a match {
       case (hoja: HojaApuesta[A]) :: cola => loop(cola, z + 1)
       case (rama: RamaApuestas[A]) :: cola => loop(rama.izq :: rama.der :: cola, z)
@@ -20,6 +21,17 @@ trait ArbolApuestas[+A]{
       case _          => 0
     }
     loop(this) - 1
+  }
+  def dame_tus_hojas: Seq[ArbolApuestas[A]] ={
+    def loop(a: List[ArbolApuestas[A]], z:Seq[HojaApuesta[A]]): Seq[HojaApuesta[A]] ={
+      a match {
+        case (h:HojaApuesta[A]) :: cola => loop(cola, z.appended(h))
+        case (rama: RamaApuestas[A]) :: cola => loop(rama.izq :: rama.der :: cola, z)
+        case _ :: cola            => loop(cola, z)
+        case _                  => z
+      }
+    }
+    loop(List(this),Seq())
   }
 }
 case class HojaApuesta[A](value: A) extends ArbolApuestas[A]

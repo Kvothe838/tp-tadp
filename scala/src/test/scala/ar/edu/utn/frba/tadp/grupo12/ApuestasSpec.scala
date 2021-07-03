@@ -35,6 +35,8 @@ class ApuestasSpec extends AnyFreeSpec{
       val arbol = Casino.generar_arbol_de_apuestas(combinatoria.flatten,(1,100))
       println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
       println(arbol)
+      println("hojas")
+      println(arbol.dame_tus_hojas)
       println("conjunto de apuestas resultante de combinacion:")
       for {
         apuestas <- comb
