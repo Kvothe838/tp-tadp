@@ -31,7 +31,7 @@ object Casino {
   def tupla_resultado_negativo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
     if(estado._2 >= apuesta.monto){
 //      println(s"para resultado negativo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)}")
-      Tuple2(1-probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)
+      Tuple2((1-probabilidad(apuesta)._1)*estado._1,estado._2-apuesta.monto)
     }else{
       estado
     }
