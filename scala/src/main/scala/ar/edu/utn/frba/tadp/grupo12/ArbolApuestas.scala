@@ -5,18 +5,18 @@ import scala.annotation.tailrec
 trait ArbolApuestas[+A]{
   def contar_hojas: Int ={
     @tailrec
-    def loop(t: List[ArbolApuestas[A]], z: Int): Int = t match {
-      case (l: HojaApuesta[A]) :: tl => loop(tl, z + 1)
-      case (n: RamaApuestas[A]) :: tl => loop(n.izq :: n.der :: tl, z)
-      case _ :: tl            => loop(tl, z)
+    def loop(a: List[ArbolApuestas[A]], z: Int): Int = a match {
+      case (hoja: HojaApuesta[A]) :: cola => loop(cola, z + 1)
+      case (rama: RamaApuestas[A]) :: cola => loop(rama.izq :: rama.der :: cola, z)
+      case _ :: cola            => loop(cola, z)
       case _                  => z
     }
     loop(List(this),  0)
   }
   def altura: Int = {
-    def loop(t: ArbolApuestas[A]): Int = t match {
-      case l: HojaApuesta[A] => 1
-      case n: RamaApuestas[A] => Seq(loop(n.izq), loop(n.der)).max + 1
+    def loop(arbol: ArbolApuestas[A]): Int = arbol match {
+      case hoja: HojaApuesta[A] => 1
+      case rama: RamaApuestas[A] => Seq(loop(rama.izq), loop(rama.der)).max + 1
       case _          => 0
     }
     loop(this) - 1
