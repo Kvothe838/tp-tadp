@@ -13,12 +13,36 @@ object Casino {
 //    println(s"apuestas.lenght ${apuestas.length}")
 //    apuestas.toSet[Apuesta].subsets.toList
 //  }
+
   def f_max(apuestas:Apuestas, g:(List[Apuesta]=>Double)):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas))
   val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   def f(apuestas:Apuestas, g:(List[Apuestas]=>Apuestas)):Apuestas = g(combinar(apuestas))
   def combinar[T](seq: Seq[T]) : List[List[T]] = {
-    (1 to seq.length).flatMap(i => seq.combinations(i).flatMap(_.permutations)).distinct.map(_.toList).toList
+    (1 to seq.length).flatMap(i => seq.combinations(i).flatMap(_.permutations)).toList.map(_.toList).distinct
   }
+  def tupla_resultado_positivo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
+    if(estado._2 >= apuesta.monto){
+//      println(s"para resultado positivo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)}")
+      Tuple2(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)
+    }else{
+      estado
+    }
+  }
+  def tupla_resultado_negativo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
+    if(estado._2 >= apuesta.monto){
+//      println(s"para resultado negativo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)}")
+      Tuple2(1-probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)
+    }else{
+      estado
+    }
+  }
+  def generar_arbol_de_apuestas(apuestas: Apuestas,dato:(Double,Double)): ArbolApuestas[(Double,Double)] =
+    if(apuestas.length == 0) HojaApuesta(dato)
+    else {
+      //      println(s"nivel arbol ${apuestas.length} , dato: ${dato}")
+      RamaApuestas(generar_arbol_de_apuestas(apuestas.tail,tupla_resultado_positivo(apuestas.head,dato)), generar_arbol_de_apuestas(apuestas.tail,tupla_resultado_negativo(apuestas.head,dato)))
+    }
+
   def probabilidad_de_conjunto(apuestas: Apuestas):Double ={
     apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   }

@@ -2,11 +2,13 @@ package ar.edu.utn.frba.tadp.grupo12
 
 import org.scalatest.freespec.AnyFreeSpec
 
+
 class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta Cara y juega" in {
-      val bob_esponja = new Jugador("Bob Esponja",TipoCauto,100)
+      val bob_esponja = Jugador("Bob Esponja",TipoCauto,100)
       val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),
+//        new Apuesta(Tipo(Cara,DistribucionEquiprobable),0),
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
       println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
@@ -20,9 +22,23 @@ class ApuestasSpec extends AnyFreeSpec{
     }
 
     "Combinacion" in {
-      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cruz,DistribucionEquiprobable),50))
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),new Apuesta(Tipo(Cruz,DistribucionEquiprobable),150))
       val comb = Casino.combinar(apuestas)
-      println(comb.flatten.map(_.tipo.tipoApuesta))
+      val combinatoria = Casino.combinar(apuestas)
+      val esperado =List(
+        List((Cara,50.0)),
+        List((Cruz,150.0)),
+        List((Cara,50.0), (Cruz,150.0)),
+        List((Cruz,150.0), (Cara,50.0)))
+      println(combinatoria.map(a => a.map(a => (a.tipo.tipoApuesta,a.monto))).distinct)
+      println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")
+      val arbol = Casino.generar_arbol_de_apuestas(combinatoria.flatten,(1,100))
+      println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
+      println(arbol)
+      println("conjunto de apuestas resultante de combinacion:")
+      for {
+        apuestas <- comb
+      }yield println(apuestas.map(a => (a.tipo.tipoApuesta,a.monto)))
       assert(comb.length == 4)
     }
 
@@ -34,7 +50,7 @@ class ApuestasSpec extends AnyFreeSpec{
       val chance_de_ganar_550 = Casino.prob_ganar(apuestas)
       assert(chance_de_ganar_550 == 0.5*1/37)
       val monto_final = Casino.jugar(apuestas,bob_marley).jugador.monto
-      println(s"monto final: ${monto_final}")
+      println(s"monto final: $monto_final")
       assert(monto_final == 5 || monto_final == 550 || monto_final == 10)
     }
 
