@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.tadp.grupo12
 
-import scala.::
 import scala.annotation.tailrec
 
 trait ArbolApuestas[+A]{
@@ -22,10 +21,12 @@ trait ArbolApuestas[+A]{
     }
     loop(this) - 1
   }
-  def dame_tus_hojas: Seq[ArbolApuestas[A]] ={
-    def loop(a: List[ArbolApuestas[A]], z:Seq[HojaApuesta[A]]): Seq[HojaApuesta[A]] ={
+
+  def dame_tus_hojas: Seq[A] ={
+    @tailrec
+    def loop(a: List[ArbolApuestas[A]], z:Seq[A]): Seq[A] ={
       a match {
-        case (h:HojaApuesta[A]) :: cola => loop(cola, z.appended(h))
+        case (h:HojaApuesta[A]) :: cola => loop(cola, z.appended(h.value))
         case (rama: RamaApuestas[A]) :: cola => loop(rama.izq :: rama.der :: cola, z)
         case _ :: cola            => loop(cola, z)
         case _                  => z
