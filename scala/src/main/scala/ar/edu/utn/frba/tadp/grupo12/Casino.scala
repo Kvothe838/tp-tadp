@@ -25,7 +25,7 @@ object Casino {
 //      println(s"para resultado positivo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)}")
       Tuple2(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)
     }else{
-      estado
+      Tuple2(probabilidad(apuesta)._1*estado._1,estado._2)
     }
   }
   def tupla_resultado_negativo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
@@ -33,7 +33,7 @@ object Casino {
 //      println(s"para resultado negativo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)}")
       Tuple2((1-probabilidad(apuesta)._1)*estado._1,estado._2-apuesta.monto)
     }else{
-      estado
+      Tuple2((1-probabilidad(apuesta)._1)*estado._1,estado._2)
     }
   }
   def generar_arbol_de_apuestas(apuestas: Apuestas,dato:(Double,Double)): ArbolApuestas[(Double,Double)] =

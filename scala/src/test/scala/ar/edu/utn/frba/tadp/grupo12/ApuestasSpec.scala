@@ -12,6 +12,9 @@ class ApuestasSpec extends AnyFreeSpec{
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
       println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
+      val arbol = Casino.generar_arbol_de_apuestas(apuestas,(1,100))
+      val resultados_posibles = arbol.dame_tus_hojas.map(a=>a._2)
+      assert(resultados_posibles.contains(resultado.jugador.monto))
       assert(resultado.jugador.monto == 50||resultado.jugador.monto == 150||resultado.jugador.monto == 300||resultado.jugador.monto == 0)
     }
 
@@ -30,17 +33,17 @@ class ApuestasSpec extends AnyFreeSpec{
         List((Cruz,150.0)),
         List((Cara,50.0), (Cruz,150.0)),
         List((Cruz,150.0), (Cara,50.0)))
-      println(combinatoria.map(a => a.map(a => (a.tipo.tipoApuesta,a.monto))).distinct)
-      println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")
-      val arbol = Casino.generar_arbol_de_apuestas(combinatoria.flatten,(1,100))
-      println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
-      println(arbol)
-      println("hojas")
-      println(arbol.dame_tus_hojas)
-      println("conjunto de apuestas resultante de combinacion:")
       for {
         apuestas <- comb
       }yield println(apuestas.map(a => (a.tipo.tipoApuesta,a.monto)))
+      println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")
+      val arbol = Casino.generar_arbol_de_apuestas(apuestas,(1,100))
+      println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
+      println("hojas")
+      for {
+        hoja <- arbol.dame_tus_hojas
+      }yield println(s"hoja:${hoja}")
+      println(s"probabilidad de no perder: ${arbol.dame_tus_hojas.filter(h=>h._2 >= 50.0).map(h=>h._1).sum}")
       assert(comb.length == 4)
     }
 
@@ -78,6 +81,7 @@ class ApuestasSpec extends AnyFreeSpec{
 
       println(s" planificacion ${Casino.planificar(arriesgado,apuestas).map(_.tipo.tipoApuesta)} cantidad ${Casino.planificar(arriesgado,apuestas).length}")
     }
+
 //    "Dos jugadores apuestan roulette" in {
 //      val roulette = new Roulette
 //      val bob_esponja = new Jugador()
