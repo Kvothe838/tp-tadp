@@ -12,7 +12,7 @@ class ApuestasSpec extends AnyFreeSpec{
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
       println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
-      val arbol = Casino.generar_arbol_de_apuestas(apuestas,(1,100))
+      val arbol = ArbolApuestas.generar_arbol_de_apuestas(apuestas,(1,100))
       val resultados_posibles = arbol.dame_tus_hojas.map(a=>a._2)
       assert(resultados_posibles.contains(resultado.jugador.monto))
       assert(resultado.jugador.monto == 50||resultado.jugador.monto == 150||resultado.jugador.monto == 300||resultado.jugador.monto == 0)
@@ -37,7 +37,7 @@ class ApuestasSpec extends AnyFreeSpec{
         apuestas <- comb
       }yield println(apuestas.map(a => (a.tipo.tipoApuesta,a.monto)))
       println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")
-      val arbol = Casino.generar_arbol_de_apuestas(apuestas,(1,100))
+      val arbol = ArbolApuestas.generar_arbol_de_apuestas(apuestas,(1,100))
       println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
       println("hojas")
       for {

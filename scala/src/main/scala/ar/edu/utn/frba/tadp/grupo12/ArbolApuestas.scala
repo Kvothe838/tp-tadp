@@ -1,5 +1,7 @@
 package ar.edu.utn.frba.tadp.grupo12
 
+import ar.edu.utn.frba.tadp.grupo12.Casino.{Apuestas, probabilidad}
+
 import scala.annotation.tailrec
 
 trait ArbolApuestas[+A]{
@@ -38,3 +40,30 @@ trait ArbolApuestas[+A]{
 case class HojaApuesta[A](value: A) extends ArbolApuestas[A]
 case class RamaApuestas[A](izq: ArbolApuestas[A], der: ArbolApuestas[A]) extends ArbolApuestas[A]
 
+object ArbolApuestas {
+  def tupla_resultado_positivo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
+    if(estado._2 >= apuesta.monto){
+      //      println(s"para resultado positivo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)}")
+      Tuple2(probabilidad(apuesta)._1*estado._1,estado._2+probabilidad(apuesta)._2*apuesta.monto-apuesta.monto)
+    }else{
+      Tuple2(probabilidad(apuesta)._1*estado._1,estado._2)
+    }
+  }
+  def tupla_resultado_negativo(apuesta:Apuesta, estado:(Double,Double)):(Double,Double) ={
+    if(estado._2 >= apuesta.monto){
+      //      println(s"para resultado negativo ${apuesta.tipo}:${apuesta.monto} estado:${estado} => estado=>${(probabilidad(apuesta)._1*estado._1,estado._2-apuesta.monto)}")
+      Tuple2((1-probabilidad(apuesta)._1)*estado._1,estado._2-apuesta.monto)
+    }else{
+      Tuple2((1-probabilidad(apuesta)._1)*estado._1,estado._2)
+    }
+  }
+  def generar_arbol_de_apuestas(apuestas: Apuestas,dato:(Double,Double)): ArbolApuestas[(Double,Double)] =
+    if(apuestas.length == 0) HojaApuesta(dato)
+    else {
+      if(apuestas.head.monto > dato._2){
+        HojaApuesta(dato)
+      } else {
+        RamaApuestas(generar_arbol_de_apuestas(apuestas.tail,tupla_resultado_positivo(apuestas.head,dato)), generar_arbol_de_apuestas(apuestas.tail,tupla_resultado_negativo(apuestas.head,dato)))
+      }
+    }
+}
