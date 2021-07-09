@@ -108,5 +108,16 @@ class ApuestasSpec extends AnyFreeSpec{
       //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
       assert(planificacion.length == apuestas.length)
     }
+
+    "Moneda cargada" in {
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(MonedaCargada(4, 7), DistribucionPonderada),10))
+
+        val bob_esponja = Jugador("Bob Esponja",TipoArriesgado,100)
+        val resultado =Casino.jugar(apuestas,bob_esponja)
+
+        //println(s" Monto:  ${resultado.jugador.monto}")
+        assert(resultado.jugador.monto == 110 || resultado.jugador.monto == 90)
+    }
   }
 }
