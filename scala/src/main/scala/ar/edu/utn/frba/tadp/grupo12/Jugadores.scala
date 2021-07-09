@@ -6,10 +6,10 @@ case class Jugador(nombre:String,tipo:TipoJugador,monto:Double){
   def puedePagar(apuesta: Apuesta): Boolean = {
     monto >= apuesta.monto
   }
-  def gana(cantidad: Double) ={
+  def gana(cantidad: Double): Jugador ={
     copy(monto = monto+cantidad)
   }
-  def pagar(apuesta: Apuesta) = {
+  def pagar(apuesta: Apuesta): Jugador = {
     copy(monto = (monto - apuesta.monto).max(0))
   }
 }

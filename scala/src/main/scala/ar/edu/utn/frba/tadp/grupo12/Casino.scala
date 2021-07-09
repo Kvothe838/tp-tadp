@@ -22,7 +22,7 @@ object Casino {
   }
 
   def probabilidad_de_conjunto(apuestas: Apuestas):Double ={
-    apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
+    apuestas.map(apuesta => probabilidad(apuesta)._1).product
   }
 
   def get_funcion_jugador(jugador: Jugador):(List[(Double,Double)])=>Double={
@@ -35,7 +35,7 @@ object Casino {
   }
 
   def puedo_jugarla(apuestas: List[Apuesta], monto: Double):Boolean={
-    if(apuestas.length == 0) true
+    if(apuestas.isEmpty) true
     else {
       if(monto >= apuestas.head.monto) {
         val monto_2 = monto - apuestas.head.monto + (apuestas.head.monto * probabilidad(apuestas.head)._2)

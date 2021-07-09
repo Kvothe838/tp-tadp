@@ -4,7 +4,7 @@ object State {
   def apply(jugador: => Jugador): State = try {
     Betting(jugador)
   } catch {
-    case error: Exception => StandBy(jugador)
+    case _: Exception => StandBy(jugador)
   }
 
 }
@@ -17,24 +17,24 @@ sealed trait State {
 }
 
 case class Betting(jugador: Jugador) extends State {
-  def map(f: Jugador => Jugador) = State(f(jugador))
-  def flatMap(f: Jugador => State) = f(jugador)
+  def map(f: Jugador => Jugador): State = State(f(jugador))
+  def flatMap(f: Jugador => State): State = f(jugador)
   def hacerApuesta(apuesta: Apuesta):State = {
     println(s"[${jugador.nombre}] hacer apuesta ${apuesta.monto} a ${apuesta.tipo.tipoApuesta}")
     pagar(apuesta)
     val resultado = Casino.evaluar(apuesta,copy(jugador.pagar(apuesta)))
     resultado
   }
-  def gana(cantidad: Double) ={
+  def gana(cantidad: Double): Betting ={
     copy(Jugador(jugador.nombre,jugador.tipo,jugador.monto+cantidad))
   }
-  def pagar(apuesta: Apuesta) = {
+  def pagar(apuesta: Apuesta): Betting = {
     copy(Jugador(jugador.nombre,jugador.tipo,(jugador.monto - apuesta.monto).max(0)))
   }
 }
 
 case class StandBy(jugador: Jugador) extends State {
-  def hacerApuesta(apuesta: Apuesta) = this
+  def hacerApuesta(apuesta: Apuesta): StandBy = this
 
   def map(f: Jugador => Jugador): State = this
 

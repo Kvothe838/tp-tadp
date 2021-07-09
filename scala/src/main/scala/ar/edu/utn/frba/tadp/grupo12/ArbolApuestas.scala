@@ -58,7 +58,7 @@ object ArbolApuestas {
     }
   }
   def generar_arbol_de_apuestas(apuestas: Apuestas,dato:(Double,Double)): ArbolApuestas[(Double,Double)] =
-    if(apuestas.length == 0) HojaApuesta(dato)
+    if(apuestas.isEmpty) HojaApuesta(dato)
     else {
       if(apuestas.head.monto > dato._2){
         HojaApuesta(dato)
