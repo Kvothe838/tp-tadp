@@ -25,25 +25,68 @@ object Casino {
     apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
   }
 
-  def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
-    val combinadas = combinar(posibles_apuestas)
+  def get_funcion_jugador(jugador: Jugador):(List[(Double,Double)])=>Double={
     jugador.tipo match {
-      //Un jugador cauto elegiría la sucesión de juegos en la cuál la probabilidad de no perder plata sea mayor.
-      // O sea, si en uno hay 20% de duplicar, 15% de quedar igual y 70% de quedar en 0,
-      // y en el otro hay 30% de triplicar, 50% de perder la mitad y 20% de quedar en 0,
-      // elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
-      case TipoCauto => combinadas.maxBy(apuestas => probabilidad_de_conjunto(apuestas))
-      //Si es un jugador racional, va a ponerle un puntaje a la distribución final de las posibles
-      // ganancias haciendo la suma de cada posible ganancia * su probabilidad de ocurrencia,
-      // y va a elegir la lista de juegos que puntúe mejor según ese criterio.
-      case TipoRacional => combinadas.maxBy(apuestas => probabilidad_de_conjunto(apuestas))
-      //Un jugador arriesgado, en cambio, va a elegir la lista de juegos para la cual el suceso que
-      // le deje mayor ganancia sea mejor, sin importar la probabilidad del mismo.
-      case TipoArriesgado => combinadas.maxBy(apuestas => apuestas.map(a=>a.monto*probabilidad(a)._2))
-
-      //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
-      case TipoCriterio(criterio) => f(posibles_apuestas,criterio)
+      case TipoCauto => (hojas:List[(Double,Double)])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
+      case TipoRacional => (hojas:List[(Double,Double)])=>hojas.map(hoja=>hoja._1 * hoja._2).sum
+      case TipoArriesgado => (hojas:List[(Double,Double)])=>hojas.map(hoja=>hoja._2).max
+      case TipoCriterio(criterio) => criterio
     }
+  }
+
+  def puedo_jugarla(apuestas: List[Apuesta], monto: Double):Boolean={
+    if(apuestas.length == 0) true
+    else {
+      if(monto >= apuestas.head.monto) {
+        val monto_2 = monto - apuestas.head.monto + (apuestas.head.monto * probabilidad(apuestas.head)._2)
+        puedo_jugarla(apuestas.tail, monto_2)
+      } else
+        false
+    }
+  }
+
+
+  def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
+    val combinadas = combinar(posibles_apuestas).filter(apuestas => puedo_jugarla(apuestas, jugador.monto))
+
+
+    /*println("\nInicio de combinadas 2")
+    for(w <- combinadas){
+      println("Inicio de grupo")
+      for(i <- w){
+        println(i.tipo.tipoApuesta);
+      }
+      println("\n")
+    }
+    println("Fin")*/
+    //val arboles = combinadas.map(lista_apuesta => ArbolApuestas.generar_arbol_de_apuestas(lista_apuesta, (1, jugador.monto)))
+    //val hojas_combinaciones = arboles.map(arbol=>arbol.dame_tus_hojas)
+
+
+    //val puntaje = hojas_combinaciones.map(hojas => funcion_jugador(hojas.toList)).max
+
+    val funcion_jugador = get_funcion_jugador(jugador)
+    //println(s"Length: ${combinadas.length}")
+    val apuestas = combinadas.sortBy(lista_apuesta=>{
+      val arbol = ArbolApuestas.generar_arbol_de_apuestas(lista_apuesta, (1, jugador.monto))
+      /*println("Arbol")
+      println("Lista_apuestas: ")
+      for(w <- lista_apuesta){
+        print(s"${w.tipo.tipoApuesta} ")
+      }
+      println("")
+      for(hoja <- arbol.dame_tus_hojas){
+        println(s"Probabilidad: ${hoja._1} Monto:${hoja._2}")
+      }*/
+      funcion_jugador(arbol.dame_tus_hojas.toList)
+    }).last
+
+    /*println("Apuestas")
+    for(w<-apuestas){
+      println(s"${w.tipo.tipoApuesta} Monto: ${w.monto}")
+    }
+    println("fin")*/
+    apuestas
   }
 
   //TODO ver como sperar esto en Distribucion Equiprobable y Distribucion a Partir de eventos Ponderados
