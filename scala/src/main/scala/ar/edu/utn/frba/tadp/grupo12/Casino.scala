@@ -48,56 +48,21 @@ object Casino {
 
   def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
     val combinadas = combinar(posibles_apuestas).filter(apuestas => puedo_jugarla(apuestas, jugador.monto))
-
-
-    /*println("\nInicio de combinadas 2")
-    for(w <- combinadas){
-      println("Inicio de grupo")
-      for(i <- w){
-        println(i.tipo.tipoApuesta);
-      }
-      println("\n")
-    }
-    println("Fin")*/
-    //val arboles = combinadas.map(lista_apuesta => ArbolApuestas.generar_arbol_de_apuestas(lista_apuesta, (1, jugador.monto)))
-    //val hojas_combinaciones = arboles.map(arbol=>arbol.dame_tus_hojas)
-
-
-    //val puntaje = hojas_combinaciones.map(hojas => funcion_jugador(hojas.toList)).max
-
     val funcion_jugador = get_funcion_jugador(jugador)
-    //println(s"Length: ${combinadas.length}")
-    val apuestas = combinadas.sortBy(lista_apuesta=>{
+    combinadas.maxBy(lista_apuesta=>{
       val arbol = ArbolApuestas.generar_arbol_de_apuestas(lista_apuesta, (1, jugador.monto))
-      /*println("Arbol")
-      println("Lista_apuestas: ")
-      for(w <- lista_apuesta){
-        print(s"${w.tipo.tipoApuesta} ")
-      }
-      println("")
-      for(hoja <- arbol.dame_tus_hojas){
-        println(s"Probabilidad: ${hoja._1} Monto:${hoja._2}")
-      }*/
       funcion_jugador(arbol.dame_tus_hojas.toList)
-    }).last
-
-    /*println("Apuestas")
-    for(w<-apuestas){
-      println(s"${w.tipo.tipoApuesta} Monto: ${w.monto}")
-    }
-    println("fin")*/
-    apuestas
+    })
   }
 
   //TODO ver como sperar esto en Distribucion Equiprobable y Distribucion a Partir de eventos Ponderados
   val probabilidad: Apuesta => (Double,Double) = apuesta =>{
     apuesta.tipo.tipoApuesta match{
       case Cara | Cruz => (DistribucionEquiprobable.probabilidad(List(Cara,Cruz)),2)
-      case CaraCargada => (DistribucionPonderada.probabilidad(List(CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada,Cruz,CaraCargada), apuesta.tipo.tipoApuesta),2)
-      case CruzCargada => (DistribucionPonderada.probabilidad(List(CruzCargada,Cara,CruzCargada,Cara,CruzCargada,Cara,CruzCargada), apuesta.tipo.tipoApuesta),2) // deberia ser una distribucion a partir de eventos ponderados ejem [Cruz,Cara,Cruz,Cara,Cruz,Cara,Cruz]
-      case Rojo | Negro | Par | Impar => (18.0/37.0,2) //porque el 0 no es par/impar ni negro/rojo
-      case PrimerDocena | SegundaDocena | TercerDocena => (12.0/37.0,3)
-      case Numero(_) => (1.0/37.0,36)
+      case Rojo | Negro | Par | Impar => (18.0/37.0, 2) //porque el 0 no es par/impar ni negro/rojo
+      case PrimerDocena | SegundaDocena | TercerDocena => (12.0/37.0, 3)
+      case Numero(_) => (1.0/37.0, 36)
+      case MonedaCargada(loquequiero, total) => (DistribucionPonderada.probabilidad(loquequiero, total), 2)
     }
   }
 
@@ -109,8 +74,9 @@ object Casino {
   // Auxiliar para método evaluar, ayuda a obtener el resultado de la apuesta
   def sale(tipoApuesta: TipoApuesta): Boolean = {
     tipoApuesta match {
-      case Cara | CaraCargada =>  dame_un_random(2) == 0
-      case Cruz | CruzCargada =>  dame_un_random(2) == 1
+      case Cara =>  dame_un_random(2) == 0
+      case Cruz =>  dame_un_random(2) == 1
+      case MonedaCargada(loquequiero, total) => List.range(1, loquequiero).contains(dame_un_random(total))
       case Rojo => List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36).contains(dame_un_random(37))
       case Negro => List[Int](2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35).contains(dame_un_random(37))
       case Par  => dame_un_random(37) % 2 == 0

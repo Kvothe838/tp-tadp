@@ -5,10 +5,9 @@ object Apuesta {
   implicit def ordering[A <: Apuesta]: Ordering[A] = Ordering.by(_.toString)
 }
 trait TipoApuesta
+case class MonedaCargada(loquequiero: Int, total: Int) extends TipoApuesta
 case object Cara extends TipoApuesta
 case object Cruz extends TipoApuesta
-case object CaraCargada extends TipoApuesta
-case object CruzCargada extends TipoApuesta
 case object PrimerDocena extends TipoApuesta
 case object SegundaDocena extends TipoApuesta
 case object TercerDocena extends TipoApuesta
@@ -25,9 +24,10 @@ case object DistribucionEquiprobable extends TipoDistribucion {
     1.0/lista.length
   }
 }
+
 case object DistribucionPonderada extends TipoDistribucion {
-  def probabilidad(lista: List[TipoApuesta],tipo: TipoApuesta):Double ={
-    lista.count(un_tipo => un_tipo == tipo).toDouble/lista.length
+  def probabilidad(loquequiero: Int, total: Int):Double ={
+    loquequiero.toDouble/total.toDouble
   }
 }
 

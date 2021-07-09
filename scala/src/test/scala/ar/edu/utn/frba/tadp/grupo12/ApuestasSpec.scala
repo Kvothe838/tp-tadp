@@ -59,30 +59,27 @@ class ApuestasSpec extends AnyFreeSpec{
       assert(monto_final == 5 || monto_final == 550 || monto_final == 10)
     }
 
-    /*Un jugador cauto elegiría la sucesión de juegos en la cuál la probabilidad de no perder plata sea mayor.
-    O sea, si en uno hay 20% de duplicar, 15% de quedar igual y 70% de quedar en 0, y en el otro hay 30% de triplicar,
-     50% de perder la mitad y 20% de quedar en 0, elige los primeros porque tiene 35% de chance de no perder plata
-     vs 30% de chance con los segundos juegos.*/
     "Jugador Cauto" in {
       val cauto = Jugador("Juan Cauto",TipoCauto,15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // 0.5, las chances de no perder son 0.5
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 1/37
-        //new Apuesta(Tipo(Par,DistribucionEquiprobable),15), // 18/37
-        //new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 1/37
 
-      val planificacion = Casino.planificar(cauto,apuestas)
-      println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+        val planificacion = Casino.planificar(cauto,apuestas)
+        //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+        assert(planificacion.length == 1)
+        assert(planificacion.head.tipo.tipoApuesta == Cara)
     }
     "Jugador Arriesgado" in {
       val arriesgado = Jugador("Juan Arriesgado",TipoArriesgado,15)
       val apuestas = List[Apuesta](
-        new Apuesta(Tipo(Cara,DistribucionEquiprobable),1000), // Cara 10
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
-        //new Apuesta(Tipo(Par,DistribucionEquiprobable),15), // 0 15
-        //new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 0 15
         val planificacion = Casino.planificar(arriesgado,apuestas)
-        println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+        //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+
+        assert(planificacion.length == 2)
+        assert(planificacion == apuestas.reverse || planificacion == apuestas)
     }
 
     "Jugador racional" in {
@@ -92,23 +89,35 @@ class ApuestasSpec extends AnyFreeSpec{
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
 
       val planificacion = Casino.planificar(racional,apuestas)
-      println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+      //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+
+      assert(planificacion.length == 1)
+      assert(planificacion.head.tipo.tipoApuesta == Cara)
     }
 
-//    "Dos jugadores apuestan roulette" in {
-//      val roulette = new Roulette
-//      val bob_esponja = new Jugador()
-//      val calamardo_tentaculos = new Jugador()
-//      val apuesta_bob_rojo = new Apuesta(bob_esponja, new Rojo, 50)
-//      val apuesta_calamardo_negro = new Apuesta(calamardo_tentaculos, new Negro, 50)
-//
-//      roulette.apostar(List(apuesta_bob_rojo, apuesta_calamardo_negro))
-//      var resultado = roulette.spin()
-//
-//      val rojos : List[Int] = List[Int](1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36)
-//      val salioRojo = rojos.contains(resultado)
-//      assert(salioRojo && bob_esponja.dinero == 150 && calamardo_tentaculos.dinero == 50 ||
-//        !salioRojo && bob_esponja.dinero == 50 && calamardo_tentaculos.dinero == 150)
-//    }
+    "Jugador adicto" in {
+      val criterio : (List[(Double,Double)])=>Double = hojas => hojas.length
+      val adicto = Jugador("Juan Adicto",TipoCriterio(criterio),15)
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
+        new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15), // 0 15
+        new Apuesta(Tipo(Par,DistribucionEquiprobable),15), // 0 15
+        new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 0 15
+
+      val planificacion = Casino.planificar(adicto,apuestas)
+      //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
+      assert(planificacion.length == apuestas.length)
+    }
+
+    "Moneda cargada" in {
+      val apuestas = List[Apuesta](
+        new Apuesta(Tipo(MonedaCargada(4, 7), DistribucionPonderada),10))
+
+        val bob_esponja = Jugador("Bob Esponja",TipoArriesgado,100)
+        val resultado =Casino.jugar(apuestas,bob_esponja)
+
+        //println(s" Monto:  ${resultado.jugador.monto}")
+        assert(resultado.jugador.monto == 110 || resultado.jugador.monto == 90)
+    }
   }
 }
