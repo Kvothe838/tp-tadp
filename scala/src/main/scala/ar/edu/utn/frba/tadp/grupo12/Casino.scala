@@ -1,39 +1,37 @@
 package ar.edu.utn.frba.tadp.grupo12
 
 
-import scala.math.Ordering.Implicits.seqOrdering
-import scala.util.{Success, Try}
+import scala.annotation.tailrec
 
 object Casino {
   type Apuestas = List[Apuesta]
-
-
+  type Probabilidad_Monto = (Double,Double)
+  type Puntaje = Double
   //No estoy seguro que que voy a hacer con esto, podría devolver Apuestas.
 //  val combinar: Apuestas => List[Apuestas] = apuestas =>  {
 //    println(s"apuestas.lenght ${apuestas.length}")
 //    apuestas.toSet[Apuesta].subsets.toList
 //  }
 
-  def f_max(apuestas:Apuestas, g:(List[Apuesta]=>Double)):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas))
-  val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).reduce(_*_)
-  def f(apuestas:Apuestas, g:(List[Apuestas]=>Apuestas)):Apuestas = g(combinar(apuestas))
+  def f_max(apuestas:Apuestas, g:List[Apuesta]=>Double):Apuestas = combinar(apuestas).maxBy(apuestas => g(apuestas))
+  val prob_ganar: Apuestas => Double = apuestas => apuestas.map(apuesta => probabilidad(apuesta)._1).product
+  def f(apuestas:Apuestas, g:List[Apuestas]=>Apuestas):Apuestas = g(combinar(apuestas))
   def combinar[T](seq: Seq[T]) : List[List[T]] = {
     (1 to seq.length).flatMap(i => seq.combinations(i).flatMap(_.permutations)).toList.map(_.toList).distinct
   }
 
-  def probabilidad_de_conjunto(apuestas: Apuestas):Double ={
-    apuestas.map(apuesta => probabilidad(apuesta)._1).product
-  }
-
-  def get_funcion_jugador(jugador: Jugador):(List[(Double,Double)])=>Double={
+  def probabilidad_de_conjunto(apuestas: Apuestas):Double = apuestas.map(apuesta => probabilidad(apuesta)._1).product
+  //Todo extraerlo en funciones
+  def get_funcion_jugador(jugador: Jugador):List[Probabilidad_Monto]=>Puntaje={
     jugador.tipo match {
-      case TipoCauto => (hojas:List[(Double,Double)])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
-      case TipoRacional => (hojas:List[(Double,Double)])=>hojas.map(hoja=>hoja._1 * hoja._2).sum
-      case TipoArriesgado => (hojas:List[(Double,Double)])=>hojas.map(hoja=>hoja._2).max
+      case TipoCauto => (hojas:List[Probabilidad_Monto])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
+      case TipoRacional => (hojas:List[Probabilidad_Monto])=>hojas.map(hoja=>hoja._1 * hoja._2).sum
+      case TipoArriesgado => (hojas:List[Probabilidad_Monto])=>hojas.map(hoja=>hoja._2).max
       case TipoCriterio(criterio) => criterio
     }
   }
 
+  @tailrec
   def puedo_jugarla(apuestas: List[Apuesta], monto: Double):Boolean={
     if(apuestas.isEmpty) true
     else {
@@ -55,8 +53,8 @@ object Casino {
     })
   }
 
-  //TODO ver como sperar esto en Distribucion Equiprobable y Distribucion a Partir de eventos Ponderados
-  val probabilidad: Apuesta => (Double,Double) = apuesta =>{
+  type Probabilidad_Multiplicador = (Double,Double)
+  val probabilidad: Apuesta => Probabilidad_Multiplicador = apuesta =>{
     apuesta.tipo.tipoApuesta match{
       case Cara | Cruz => (DistribucionEquiprobable.probabilidad(List(Cara,Cruz)),2)
       case Rojo | Negro | Par | Impar => (18.0/37.0, 2) //porque el 0 no es par/impar ni negro/rojo
@@ -115,3 +113,6 @@ object Casino {
 
 
 }
+
+object CaraCruz
+object Ruleta

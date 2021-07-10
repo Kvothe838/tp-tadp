@@ -30,3 +30,7 @@ case object TipoArriesgado extends TipoJugador
 case object TipoCauto extends TipoJugador
 //También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
 case class TipoCriterio(criterio: (List[(Double,Double)])=>Double) extends TipoJugador
+//object Comportamiento {
+//  type Probabilidad_Monto
+//  def tipoCauto: List[Probabilidad_Monto]=>Double = hojas => (hojas:List[Probabilidad_Monto])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
+//}
