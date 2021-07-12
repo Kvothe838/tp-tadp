@@ -1,8 +1,9 @@
 package ar.edu.utn.frba.tadp.grupo12
 
-import ar.edu.utn.frba.tadp.grupo12.Casino.Apuestas
+import ar.edu.utn.frba.tadp.grupo12.Types.Criterio
+import ar.edu.utn.frba.tadp.grupo12.Types.Probabilidad_Monto
 
-case class Jugador(nombre:String,tipo:TipoJugador,monto:Double){
+case class Jugador(nombre:String, perfil: Criterio, monto:Double){
   def puedePagar(apuesta: Apuesta): Boolean = {
     monto >= apuesta.monto
   }
@@ -14,23 +15,14 @@ case class Jugador(nombre:String,tipo:TipoJugador,monto:Double){
   }
 }
 
-trait TipoJugador
+case object Types {
+  type Criterio = (List[(Double,Double)], Double) => Double
+  type Probabilidad_Monto = (Double,Double)
+}
 
-//Si es un jugador racional, va a ponerle un puntaje a la distribución final de las posibles
-// ganancias haciendo la suma de cada posible ganancia * su probabilidad de ocurrencia,
-// y va a elegir la lista de juegos que puntúe mejor según ese criterio.
-case object TipoRacional extends TipoJugador
-//Un jugador arriesgado, en cambio, va a elegir la lista de juegos para la cual el suceso que
-// le deje mayor ganancia sea mejor, sin importar la probabilidad del mismo.
-case object TipoArriesgado extends TipoJugador
-//Un jugador cauto elegiría la sucesión de juegos en la cuál la probabilidad de no perder plata sea mayor.
-// O sea, si en uno hay 20% de duplicar, 15% de quedar igual y 70% de quedar en 0,
-// y en el otro hay 30% de triplicar, 50% de perder la mitad y 20% de quedar en 0,
-// elige los primeros porque tiene 35% de chance de no perder plata vs 30% de chance con los segundos juegos.
-case object TipoCauto extends TipoJugador
-//También queremos dar la posibilidad al usuario de crear un jugador al que le pasamos un criterio para comparar distribuciones y elige según ese criterio.
-case class TipoCriterio(criterio: (List[(Double,Double)])=>Double) extends TipoJugador
-//object Comportamiento {
-//  type Probabilidad_Monto
-//  def tipoCauto: List[Probabilidad_Monto]=>Double = hojas => (hojas:List[Probabilidad_Monto])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
-//}
+case object Perfil{
+  def TipoCauto: Criterio = (hojas:List[Probabilidad_Monto], monto: Double)=>hojas.filter(hoja => hoja._2 >= monto).map(hoja=>hoja._1).sum
+  def TipoRacional: Criterio = (hojas:List[Probabilidad_Monto], _)=>hojas.map(hoja=>hoja._1 * hoja._2).sum
+  def TipoArriesgado: Criterio = (hojas:List[Probabilidad_Monto], _)=>hojas.map(hoja=>hoja._2).max
+}
+

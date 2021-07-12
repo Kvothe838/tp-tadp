@@ -26,10 +26,10 @@ case class Betting(jugador: Jugador) extends State {
     resultado
   }
   def gana(cantidad: Double): Betting ={
-    copy(Jugador(jugador.nombre,jugador.tipo,jugador.monto+cantidad))
+    copy(Jugador(jugador.nombre,jugador.perfil,jugador.monto+cantidad))
   }
   def pagar(apuesta: Apuesta): Betting = {
-    copy(Jugador(jugador.nombre,jugador.tipo,(jugador.monto - apuesta.monto).max(0)))
+    copy(Jugador(jugador.nombre,jugador.perfil,(jugador.monto - apuesta.monto).max(0)))
   }
 }
 

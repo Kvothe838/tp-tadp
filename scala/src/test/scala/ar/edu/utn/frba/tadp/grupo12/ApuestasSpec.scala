@@ -1,17 +1,15 @@
 package ar.edu.utn.frba.tadp.grupo12
 
+import ar.edu.utn.frba.tadp.grupo12.Types.Criterio
 import org.scalatest.freespec.AnyFreeSpec
-
 
 class ApuestasSpec extends AnyFreeSpec{
   "Apostar" - {
     "Jugador apuesta Cara y juega" in {
-      val bob_esponja = Jugador("Bob Esponja",TipoCauto,100)
-      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),
-//        new Apuesta(Tipo(Cara,DistribucionEquiprobable),0),
+      val bob_esponja = Jugador("Bob Esponja", Perfil.TipoCauto, 100)
+      val apuestas = List[Apuesta](new Apuesta(Tipo(Cara, DistribucionEquiprobable),50),
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
-      println(s"[${resultado.jugador.nombre}] termino sus apuestas con ${resultado.jugador.monto}")
       val arbol = ArbolApuestas.generar_arbol_de_apuestas(apuestas,(1,100))
       val resultados_posibles = arbol.dame_tus_hojas.map(a=>a._2)
       assert(resultados_posibles.contains(resultado.jugador.monto))
@@ -33,22 +31,22 @@ class ApuestasSpec extends AnyFreeSpec{
         List((Cruz,150.0)),
         List((Cara,50.0), (Cruz,150.0)),
         List((Cruz,150.0), (Cara,50.0)))
-      for {
+      /*for {
         apuestas <- comb
       }yield println(apuestas.map(a => (a.tipo.tipoApuesta,a.monto)))
-      println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")
+      println(s"combinatoria.length:${combinatoria.length} deberia generar un arbol binario de ${scala.math.pow(2,combinatoria.flatten.length)} hojas")*/
       val arbol = ArbolApuestas.generar_arbol_de_apuestas(apuestas,(1,100))
-      println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
+      /*println(s"Un arbol de altura ${arbol.altura} con ${arbol.contar_hojas}")
       println("hojas")
       for {
         hoja <- arbol.dame_tus_hojas
-      }yield println(s"hoja:${hoja}")
-      println(s"probabilidad de no perder: ${arbol.dame_tus_hojas.filter(h=>h._2 >= 50.0).map(h=>h._1).sum}")
-      assert(comb.length == 4)
+      }yield println(s"hoja:$hoja")
+      println(s"probabilidad de no perder: ${arbol.dame_tus_hojas.filter(h=>h._2 >= 50.0).map(h=>h._1).sum}")*/
+      assert(comb.length == esperado.length)
     }
 
     "Juegos Sucesivos" in {
-      val bob_marley = Jugador("Bob Marley",TipoCauto,15)
+      val bob_marley = Jugador("Bob Marley", Perfil.TipoCauto,15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
@@ -60,7 +58,7 @@ class ApuestasSpec extends AnyFreeSpec{
     }
 
     "Jugador Cauto" in {
-      val cauto = Jugador("Juan Cauto",TipoCauto,15)
+      val cauto = Jugador("Juan Cauto", Perfil.TipoCauto,15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // 0.5, las chances de no perder son 0.5
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 1/37
@@ -71,19 +69,18 @@ class ApuestasSpec extends AnyFreeSpec{
         assert(planificacion.head.tipo.tipoApuesta == Cara)
     }
     "Jugador Arriesgado" in {
-      val arriesgado = Jugador("Juan Arriesgado",TipoArriesgado,15)
+      val arriesgado = Jugador("Juan Arriesgado", Perfil.TipoArriesgado, 15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
         val planificacion = Casino.planificar(arriesgado,apuestas)
-        //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
 
         assert(planificacion.length == 2)
         assert(planificacion == apuestas.reverse || planificacion == apuestas)
     }
 
     "Jugador racional" in {
-      val racional = Jugador("Juan Racional",TipoRacional,15)
+      val racional = Jugador("Juan Racional", Perfil.TipoRacional,15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15)) // 0 15
@@ -96,8 +93,8 @@ class ApuestasSpec extends AnyFreeSpec{
     }
 
     "Jugador adicto" in {
-      val criterio : (List[(Double,Double)])=>Double = hojas => hojas.length
-      val adicto = Jugador("Juan Adicto",TipoCriterio(criterio),15)
+      val criterio : Criterio = (hojas, _) => hojas.length
+      val adicto = Jugador("Juan Adicto", criterio, 15)
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),10), // Cara 10
         new Apuesta(Tipo(Numero(0),DistribucionEquiprobable),15), // 0 15
@@ -105,7 +102,6 @@ class ApuestasSpec extends AnyFreeSpec{
         new Apuesta(Tipo(Numero(2),DistribucionEquiprobable),16)) // 0 15
 
       val planificacion = Casino.planificar(adicto,apuestas)
-      //println(s" planificacion ${planificacion.map(_.tipo.tipoApuesta)} cantidad ${planificacion.length}")
       assert(planificacion.length == apuestas.length)
     }
 
@@ -113,10 +109,9 @@ class ApuestasSpec extends AnyFreeSpec{
       val apuestas = List[Apuesta](
         new Apuesta(Tipo(MonedaCargada(4, 7), DistribucionPonderada),10))
 
-        val bob_esponja = Jugador("Bob Esponja",TipoArriesgado,100)
+        val bob_esponja = Jugador("Bob Esponja", Perfil.TipoArriesgado, 100)
         val resultado =Casino.jugar(apuestas,bob_esponja)
 
-        //println(s" Monto:  ${resultado.jugador.monto}")
         assert(resultado.jugador.monto == 110 || resultado.jugador.monto == 90)
     }
   }

@@ -12,7 +12,7 @@ class ArbolSpec extends AnyFreeSpec{
       assert(arbol.altura == apuestas.length)
     }
     "El resultado de las apuestas  del Jugador esta contenido en las hojas del arbol" in {
-      val bob_esponja = Jugador("Bob Esponja",TipoCauto,100)
+      val bob_esponja = Jugador("Bob Esponja", Perfil.TipoCauto,100)
       val apuestas = List[Apuesta](new Apuesta(Tipo(Cara,DistribucionEquiprobable),50),
         new Apuesta(Tipo(Cara,DistribucionEquiprobable),150))
       val resultado =Casino.jugar(apuestas,bob_esponja)
@@ -28,12 +28,12 @@ class ArbolSpec extends AnyFreeSpec{
       // Paso 2) Filtro los resultados que tienen la forma (Probabilidad, Monto) segun lo que me interese, en este caso me interesa saber cuales de esos resultados terminan con montos menores a 100 o mayores o iguales a 100
       val resultados_con_montos_menores_a_100 = resultados.filter(a=>a._2 < 100)
       val resultados_con_montos_mayores_a_100 = resultados.filter(a=>a._2 >= 100)
-      println(s"Resultados posibles que tienen un monto MENOR a 100:${resultados_con_montos_menores_a_100}")
-      println(s"Resultados posibles que tienen un monto MAYOR o IGUAL a 100:${resultados_con_montos_mayores_a_100}")
+      /*println(s"Resultados posibles que tienen un monto MENOR a 100:${resultados_con_montos_menores_a_100}")
+      println(s"Resultados posibles que tienen un monto MAYOR o IGUAL a 100:${resultados_con_montos_mayores_a_100}")*/
       // Paso 3) Me interesa saber cual es la probabilidad de que termine con montos menores a 100 o montos mayores o iguales a 100
       val probabilidad_de_que_el_monto_sea_mayor_a_100 = resultados_con_montos_mayores_a_100.map(a=>a._1).sum
-      println(s"Esto significa que la probabilidad de tener un resultado MENOR a 100 es:${resultados_con_montos_menores_a_100.map(a=>a._1).sum}")
-      println(s"Esto significa que la probabilidad de tener un resultado MAYOR o IGUAL a 100 es:${probabilidad_de_que_el_monto_sea_mayor_a_100}")
+      /*println(s"Esto significa que la probabilidad de tener un resultado MENOR a 100 es:${resultados_con_montos_menores_a_100.map(a=>a._1).sum}")
+      println(s"Esto significa que la probabilidad de tener un resultado MAYOR o IGUAL a 100 es:${probabilidad_de_que_el_monto_sea_mayor_a_100}")*/
       // Paso 4) Verifico que la suma de las probabilidades de tener un monto menor a 100 y las de tener un monto mayor o igual a 100 sea igual a 1.
       assert(scala.math.abs(1-(resultados_con_montos_menores_a_100.map(a=>a._1).sum+probabilidad_de_que_el_monto_sea_mayor_a_100)) < 0.0001)
     }
@@ -45,12 +45,12 @@ class ArbolSpec extends AnyFreeSpec{
       // Paso 2) Filtro los resultados que tienen la forma (Probabilidad, Monto) segun lo que me interese, en este caso me interesa saber cuales de esos resultados terminan con montos menores a 100 o mayores o iguales a 100
       val resultados_con_montos_menores_a_15 = resultados.filter(a=>a._2 < 15)
       val resultados_con_montos_mayores_a_15 = resultados.filter(a=>a._2 >= 15)
-      println(s"Resultados posibles que tienen un monto MENOR a 15:${resultados_con_montos_menores_a_15}")
-      println(s"Resultados posibles que tienen un monto MAYOR o IGUAL a 15:${resultados_con_montos_mayores_a_15}")
+      /*println(s"Resultados posibles que tienen un monto MENOR a 15:${resultados_con_montos_menores_a_15}")
+      println(s"Resultados posibles que tienen un monto MAYOR o IGUAL a 15:${resultados_con_montos_mayores_a_15}")*/
       // Paso 3) Me interesa saber cual es la probabilidad de que termine con montos menores a 100 o montos mayores o iguales a 100
       val probabilidad_de_que_el_monto_sea_mayor_a_15 = resultados_con_montos_mayores_a_15.map(a=>a._1).sum
-      println(s"Esto significa que la probabilidad de tener un resultado MENOR a 15 es:${resultados_con_montos_menores_a_15.map(a=>a._1).sum}")
-      println(s"Esto significa que la probabilidad de tener un resultado MAYOR o IGUAL a 15 es:${probabilidad_de_que_el_monto_sea_mayor_a_15}")
+      /*println(s"Esto significa que la probabilidad de tener un resultado MENOR a 15 es:${resultados_con_montos_menores_a_15.map(a=>a._1).sum}")
+      println(s"Esto significa que la probabilidad de tener un resultado MAYOR o IGUAL a 15 es:${probabilidad_de_que_el_monto_sea_mayor_a_15}")*/
       // Paso 4) Verifico que la suma de las probabilidades de tener un monto menor a 100 y las de tener un monto mayor o igual a 100 sea igual a 1.
       assert(scala.math.abs(1-(resultados_con_montos_menores_a_15.map(a=>a._1).sum+probabilidad_de_que_el_monto_sea_mayor_a_15)) < 0.0001)
     }

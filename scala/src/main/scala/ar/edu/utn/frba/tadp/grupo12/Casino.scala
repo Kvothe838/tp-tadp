@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.tadp.grupo12
 
-
 import scala.annotation.tailrec
 
 object Casino {
@@ -21,15 +20,6 @@ object Casino {
   }
 
   def probabilidad_de_conjunto(apuestas: Apuestas):Double = apuestas.map(apuesta => probabilidad(apuesta)._1).product
-  //Todo extraerlo en funciones
-  def get_funcion_jugador(jugador: Jugador):List[Probabilidad_Monto]=>Puntaje={
-    jugador.tipo match {
-      case TipoCauto => (hojas:List[Probabilidad_Monto])=>hojas.filter(hoja => hoja._2 >= jugador.monto).map(hoja=>hoja._1).sum
-      case TipoRacional => (hojas:List[Probabilidad_Monto])=>hojas.map(hoja=>hoja._1 * hoja._2).sum
-      case TipoArriesgado => (hojas:List[Probabilidad_Monto])=>hojas.map(hoja=>hoja._2).max
-      case TipoCriterio(criterio) => criterio
-    }
-  }
 
   @tailrec
   def puedo_jugarla(apuestas: List[Apuesta], monto: Double):Boolean={
@@ -46,10 +36,10 @@ object Casino {
 
   def planificar(jugador:Jugador, posibles_apuestas:Apuestas): Apuestas ={
     val combinadas = combinar(posibles_apuestas).filter(apuestas => puedo_jugarla(apuestas, jugador.monto))
-    val funcion_jugador = get_funcion_jugador(jugador)
+
     combinadas.maxBy(lista_apuesta=>{
       val arbol = ArbolApuestas.generar_arbol_de_apuestas(lista_apuesta, (1, jugador.monto))
-      funcion_jugador(arbol.dame_tus_hojas.toList)
+      jugador.perfil(arbol.dame_tus_hojas.toList, jugador.monto)
     })
   }
 
@@ -95,24 +85,16 @@ object Casino {
     }
   }
 
-  // states
-
-
   def jugar(apuestas: Apuestas, jugador: Jugador): State ={
     apuestas.foldLeft(State(jugador)){
       (resultado_previo, apuesta) =>
         resultado_previo match{
           case Betting(jugador) => if(jugador.puedePagar(apuesta)) resultado_previo.hacerApuesta(apuesta) else {
-            println(s"[${jugador.nombre}] no puede pagar ${apuesta.monto} porque solo tiene ${jugador.monto}")
+            //println(s"[${jugador.nombre}] no puede pagar ${apuesta.monto} porque solo tiene ${jugador.monto}")
             StandBy(jugador)
           }
           case StandBy(jugador) => jugar(apuestas.tail,jugador)
         }
     }
   }
-
-
 }
-
-object CaraCruz
-object Ruleta
