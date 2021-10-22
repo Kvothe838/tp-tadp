@@ -1,3 +1,3 @@
 # TADP
 
-Este repositorio tiene la estructura básica para arrancar a _darle átomos_ a la materia! :rocket:
+TP: https://docs.google.com/document/d/1-pDyPjbzMNuZr4hux6kWVN6txvSlxgxawfqUe72x4Bg/edit#
